@@ -5,5 +5,5 @@
 #
 
 #! @Description
-#!   Insert documentation for you function here
-DeclareGlobalFunction( "GaloisGroups_Example" );
+#!   The galois group of a polynomial
+DeclareAttribute( "GaloisGroup", IsPolynomialFunction );

@@ -3,8 +3,10 @@
 #
 # Implementations
 #
-InstallGlobalFunction( GaloisGroups_Example,
-function()
-	Print( "This is a placeholder function, replace it with your own code.\n" );
+
+InstallMethod( GaloisGroup, "for a polynomial over the rationals",
+               [ IsPolynomialFunction ],
+function(p)
+    Error("not implemented yet");
 end );
 
