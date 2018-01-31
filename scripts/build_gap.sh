@@ -23,9 +23,11 @@ make -j4 V=1
 # connection is refused, to work around intermittent failures
 make bootstrap-pkg-full WGET="wget -N --no-check-certificate --tries=5 --waitretry=5 --retry-connrefused"
 
+git clone https://github.com/gap-packages/ferret pkg/ferret
+
 # build some packages (default is to build 'io' and 'profiling',
 # in order to generate coverage results)
 cd pkg
-for pkg in ${GAP_PKGS_TO_BUILD-io profiling}; do
+for pkg in ${GAP_PKGS_TO_BUILD-io profiling ferret digraphs}; do
     ../bin/BuildPackages.sh --strict $pkg*
 done
