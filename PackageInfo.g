@@ -14,44 +14,45 @@ Version := "0.1",
 Date := "31/01/2018", # dd/mm/yyyy format
 
 Persons := [
-  rec(
-    IsAuthor := true,
-    IsMaintainer := true,
-    FirstNames := "Markus",
-    LastName := "Pfeiffer",
-    WWWHome := "https://markusp.morphism.de/",
-    Email := "markus.pfeiffer@st-andrews.ac.uk",
-    PostalAddress := Concatenation(
-               "School of Computer Science\n",
-               "University of St Andrews\n",
-               "Jack Cole Building, North Haugh\n",
-               "St Andrews, Fife, KY16 9SX\n",
-               "United Kingdom" ),
-    Place := "St Andrews",
-    Institution := "University of St Andrews",
-  ),
-  rec(
-    IsAuthor := true,
-    IsMaintainer := true,
-    FirstNames := "Vincent",
-    LastName := "Delecroix",
-    WWWHome := "TODO",
-    Email := "vincent.delecroix@u-bordeaux.fr",
-    PostalAddress := "TODO",
-    Place := "Bordeaux",
-    Institution := "Universite de Bordeaux",
-  ),
-  rec(
-    IsAuthor := true,
-    IsMaintainer := true,
-    FirstNames := "Bill",
-    LastName := "Allombert",
-    WWWHome := "TODO",
-    Email := "Bill.Allombert@math.u-bordeaux.fr",
-    PostalAddress := "TODO",
-    Place := "Bordeaux",
-    Institution := "TODO",
-  ),
+             rec(
+                  IsAuthor := true,
+                  IsMaintainer := true,
+                  FirstNames := "Bill",
+                  LastName := "Allombert",
+                  WWWHome := "TODO",
+                  Email := "Bill.Allombert@math.u-bordeaux.fr",
+                  PostalAddress := "TODO",
+                  Place := "Bordeaux",
+                  Institution := "TODO",
+                 ),
+             rec(
+                  IsAuthor := true,
+                  IsMaintainer := true,
+                  FirstNames := "Vincent",
+                  LastName := "Delecroix",
+                  WWWHome := "TODO",
+                  Email := "vincent.delecroix@u-bordeaux.fr",
+                  PostalAddress := "TODO",
+                  Place := "Bordeaux",
+                  Institution := "Universite de Bordeaux",
+                 ),
+             
+             rec(
+                  IsAuthor := true,
+                  IsMaintainer := true,
+                  FirstNames := "Markus",
+                  LastName := "Pfeiffer",
+                  WWWHome := "https://markusp.morphism.de/",
+                  Email := "markus.pfeiffer@st-andrews.ac.uk",
+                  PostalAddress := Concatenation(
+                                                  "School of Computer Science\n",
+                                                  "University of St Andrews\n",
+                                                  "Jack Cole Building, North Haugh\n",
+                                                  "St Andrews, Fife, KY16 9SX\n",
+                                                  "United Kingdom" ),
+                  Place := "St Andrews",
+                  Institution := "University of St Andrews",
+                 ),
 ],
 
 SourceRepository := rec(
@@ -92,7 +93,10 @@ PackageDoc := rec(
 
 Dependencies := rec(
   GAP := ">= 4.8",
-  NeededOtherPackages := [ [ "GAPDoc", ">= 1.5" ] ],
+  NeededOtherPackages := [ [ "GAPDoc", ">= 1.6" ]
+                         , [ "Digraphs", ">= 0.11" ]
+                         , [ "ferret", ">= 0.8.0" ]
+                         , [ "alnuth", ">= 3.1.0" ] ],
   SuggestedOtherPackages := [ ],
   ExternalConditions := [ ],
 ),
