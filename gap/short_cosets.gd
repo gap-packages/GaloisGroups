@@ -1,1 +1,2 @@
+DeclareGlobalFunction( "NaiveShortCosets" );
 DeclareGlobalFunction( "ShortCosets" );

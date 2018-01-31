@@ -1,7 +1,7 @@
 gap> A13 := TransitiveGroup(13,8);;
 gap> L13 := TransitiveGroup(13,7);;
 gap> t := (1,4,6,2)(3,7,8,5,13,11,10,9);;
-gap> ShortCosets(A13, L13, t);
-[ (1,2,3,10,8)(4,9,13,5)(7,12), (1,2,8)(4,7,12,5)(9,10,13,11),
-  (1,2,3,8,6)(4,7,12,9,13,11,5), (1,2,8,6)(3,13,9,10)(4,5)(7,12) ] 
-
+gap> sc := Set(ShortCosets(A13, L13, t), x -> RightCoset(L13, x));;
+gap> nsc := Set(NaiveShortCosets(A13, L13, t), x -> RightCoset(L13, x));;
+gap> sc = nsc;
+true
