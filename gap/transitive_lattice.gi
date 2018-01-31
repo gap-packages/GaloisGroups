@@ -1,33 +1,45 @@
 # Super ugly and inefficient
 InstallGlobalFunction(TransitiveMaximalSubgroups,
 function(deg)
-    local omega, g, G, TMCR, tree, edges, i, j, k, graph, subtrees, todo, conjugate, trans;
-    
+    local omega
+        , g
+        , Sym
+        , TMCR
+        , edges
+        , i, j, k
+        , graph
+        , subtrees
+        , todo
+        , conjugate
+        , trans;
+    if not IsPosInt(deg) then
+        Error("deg has to be a positive integer");
+    fi;
+
+    Sym := SymmetricGroup(deg);
+    trans := AllTransitiveGroups(NrMovedPoints, deg);
+
     omega := [1..deg];
     subtrees := [];
     conjugate := [];
-    tree := [];
-
-    G := SymmetricGroup(deg);
-    trans := AllTransitiveGroups(NrMovedPoints, deg);
-
-    # Note that it is important to specify the domain!
-    tree := [G];
     edges := [];
-    todo := [TransitiveIdentification(G)];
+
+    todo := [Length(trans)]; # This is the symmetric group
+
     while not IsEmpty(todo) do
         k := Remove(todo);
-        Print("Looking at ", k, " (", trans[k], ")\n");
-        
+        Info(InfoTransitiveMaximal, 5,
+             "Looking at ", k, " (", trans[k], ")");
+
         if not IsBound(subtrees[k]) then
             TMCR := Filtered(MaximalSubgroupClassReps(TransitiveGroup(deg, k)), x -> IsTransitive(x, omega));
             subtrees[k] := [];
             conjugate[k] := [];
             for g in TMCR do
                 i := TransitiveIdentification(g);
-                Print("rep act: ", g, " ", trans[i], "\n");
-                j := RepresentativeAction(SymmetricGroup(deg), g, trans[i]);
-                # j := ContainingConjugates(SymmetricGroup(deg), g, trans[i]);
+                Info(InfoTransitiveMaximal, 5,
+                     "rep act: ", g, " ", trans[i]);
+                j := RepresentativeAction(Sym, g, trans[i]);
                 Add(subtrees[k], i);
                 Add(conjugate[k], [g, j]);
             od;
@@ -40,6 +52,23 @@ function(deg)
     graph := DigraphByEdges(edges);
     return [graph, subtrees, conjugate];
 end);
+
+InstallGlobalFunction(TestTransitiveMaximals,
+function(deg)
+    local t, i, j, g;
+
+    t := TransitiveMaximalSubgroups(deg);
+
+    for i in [1..Length(t[3])] do
+        for j in [1..Length(t[3][i])] do
+            if TransitiveGroup(deg, t[2][i][j]) <> t[3][i][j][1] ^ (t[3][i][j][2]) then
+                Error("Group failed verification.");
+            fi;
+        od;
+    od;
+    return true;
+end);
+
 
 InstallGlobalFunction(TransitiveMaximalSubgroups2,
 function(deg)
