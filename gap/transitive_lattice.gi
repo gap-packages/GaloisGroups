@@ -26,9 +26,10 @@ function(deg)
             for g in TMCR do
                 i := TransitiveIdentification(g);
                 Print("rep act: ", g, " ", trans[i], "\n");
-                j := ContainingConjugates(SymmetricGroup(deg), g, trans[i]);
+                j := RepresentativeAction(SymmetricGroup(deg), g, trans[i]);
+                # j := ContainingConjugates(SymmetricGroup(deg), g, trans[i]);
                 Add(subtrees[k], i);
-                Add(conjugate[k], j);
+                Add(conjugate[k], [g, j]);
             od;
 
             Append(edges, List(subtrees[k], x -> [k, x]));
