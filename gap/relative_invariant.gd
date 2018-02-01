@@ -1,0 +1,2 @@
+DeclareGlobalFunction( "RelativeInvariantMinimalDegree" );
+DeclareGlobalFunction( "AllSubgroupsDegrees" );

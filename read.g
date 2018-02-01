@@ -7,3 +7,4 @@
 ReadPackage( "GaloisGroups", "gap/short_cosets.gi");
 ReadPackage( "GaloisGroups", "gap/transitive_lattice.gi");
 ReadPackage( "GaloisGroups", "gap/GaloisGroups.gi");
+ReadPackage( "GaloisGroups", "gap/relative_invariant.gi");
