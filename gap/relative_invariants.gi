@@ -5,19 +5,11 @@
 # the algebra of G-invariant polynomials on the
 # basis of H-invariant ones.
 #
-# Examples
-#
-# For the inclusion A5 in S5, the minimal degree is the discriminant
-#
-# gap> RelativeInvariantMinimalDegree(SymmetricGroup(5), AlternatingGroup(5));
-# [ 10, 1 ]
-#
-# An example with dimension > 1
-#
-# gap> G := TransitiveGroup(11, 4);
-# gap> H := TransitiveGroup(11, 2);
-# gap> RelativeInvariantMinimalDegree(G, H);
-# [ 2, 4 ]
+
+PermToGP := function(p,l)
+  return Permuted([1..l],p);
+end;
+
 InstallGlobalFunction(RelativeInvariantMinimalDegree,
 function(G, H)
   local fG, fH, vG, vH, n;
@@ -71,11 +63,6 @@ end;
 #
 # Examples
 #
-# gap> ParttitionsByDegree(3);
-# [ [ [ [ 2, 1 ] ] ], [  ], [ [ [ 1, 1, 1 ] ] ] ]
-# gap> PartitionsByDegree(4);
-# [ [ [ [ 3, 1 ] ] ], [ [ [ 2, 2 ] ] ], [ [ [ 2, 1, 1 ] ] ], [  ], [  ], 
-# [ [ [ 1, 1, 1, 1 ] ] ] ]
 PartitionsByDegree := function(d)
   local i, p, s, L;
   L := [];
@@ -94,6 +81,18 @@ PartitionsByDegree := function(d)
   return L;
 end;
 
+FlatMonomial := function(p)
+  local i, j, k, q;
+  q := [];
+  for i in [1..Size(p)] do
+    for j in [1..Size(p[i])] do
+      for k in [1..i] do
+        Add(q, p[i][j]);
+      od;
+    od;
+  od;
+  return q;
+end;
 
 # Return a monomial of minimal degree that gives
 # a polynomial in Q[x1,x2,...,xd] that is invariant
@@ -135,14 +134,44 @@ MonomialMinimalDegree := function(G, H, P)
   od;
 end;
 
+InstallGlobalFunction(AllMonomials,
+function(G, H, q)
+  local o,k,L;
+  # o := Orb(G, q, OnTuplesSets);
+  # Enumerate(o);
+  # return FindSuborbits(o, H);
+  o := Orbit(G, q, OnTuplesSets);
+  L := [];
+  for k in Orbits(H, o, OnTuplesSets) do
+    Add(L, Minimum(k));
+  od;
+  return L;
+end);
+
 # Write canonical factorization for transitive subgroups
 # of Sd into files.
-InstallGlobalFunction(AllSubgroupsDegrees,
-function(d)
-  local i,j,k,t,q,cH,P,G,H,filename;
+InstallGlobalFunction(GaloisDescentTable,
+function(d,filename)
+  local first,ffirst,i,j,k,g,t,q,qq,cH,P,G,H;
+  PrintTo(filename);   # delete everything
   t := TransitiveMaximalSubgroups(d);
   P := PartitionsByDegree(d);
   for i in [1..NrTransitiveGroups(d)] do
+    G := TransitiveGroup(d,i);
+    AppendTo(filename, "[\"", ViewString(G), "\",[");
+    first := true;
+    for g in GeneratorsOfGroup(G) do
+      if not first then
+        AppendTo(filename,",");
+      fi;
+      AppendTo(filename, PermToGP(g,d));
+      first := false;
+    od;
+    AppendTo(filename, "]");
+    first := true;
+    if Size(t[2][i]) <> 0 then
+      AppendTo(filename, ",");
+    fi;
     for j in [1..Size(t[2][i])] do
       k := t[2][i][j];
       # Ignore the case Sd -> Ad
@@ -156,14 +185,23 @@ function(d)
       if H^cH <> TransitiveGroup(d,k) then
         Error("pb");
       fi;
-
-      filename := Concatenation("T", String(d), "n", String(i), "_", String(j));
-      Print(filename, "\n");
-      Print("i=",i," (G=",TransitiveGroup(d,i),") -> k=",k," (H=",TransitiveGroup(d,k),"):\n");
-      PrintTo(filename);
       q := MonomialMinimalDegree(G, H, P);
-      AppendTo(filename, q);
-      AppendTo(filename, "\n");
+      Print("q=",q,"\n");
+      if not first then
+        AppendTo(filename , ",");
+      fi;
+      AppendTo(filename, "[", k, ",", PermToGP(cH, d), ",[");
+      ffirst := true;
+      for qq in AllMonomials(G,H,q) do
+        if not ffirst then
+          AppendTo(filename, ",");
+        fi;
+        AppendTo(filename, FlatMonomial(qq));
+        ffirst := false;
+      od;
+      AppendTo(filename, "]]");
+      first := false;
     od;
+    AppendTo(filename, "]\n");
   od;
 end);

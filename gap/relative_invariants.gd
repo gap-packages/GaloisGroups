@@ -1,2 +1,3 @@
 DeclareGlobalFunction( "RelativeInvariantMinimalDegree" );
-DeclareGlobalFunction( "AllSubgroupsDegrees" );
+DeclareGlobalFunction( "GaloisDescentTable" );
+DeclareGlobalFunction( "AllMonomials" );
