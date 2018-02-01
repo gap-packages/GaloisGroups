@@ -11,5 +11,5 @@ Unbind(_PATH_SO);
 
 ReadPackage( "GaloisGroups", "gap/short_cosets.gd");
 ReadPackage( "GaloisGroups", "gap/transitive_lattice.gd");
-ReadPackage( "GaloisGroups", "gap/relative_invariant.gd");
+ReadPackage( "GaloisGroups", "gap/relative_invariants.gd");
 ReadPackage( "GaloisGroups", "gap/GaloisGroups.gd");
