@@ -6,12 +6,13 @@
 # gap> nsc := Set(NaiveShortCosets(A13, L13, t), x -> RightCoset(L13, x));;
 # gap> sc = nsc;
 # true
-gap> A7 := TransitiveGroup(7,6);
-A7
-gap> L7 := TransitiveGroup(7,5);
-L(7) = L(3,2)
-gap> for i in [1..20] do
+gap> A7 := TransitiveGroup(7,6);;
+gap> L7 := TransitiveGroup(7,5);;
+gap> ForAll([1..20], function(x)
+>  local t, sc, nsc;
 >  t := Random(A7);
 >  sc := Set(ShortCosets(A7, L7, t), x -> RightCoset(L7, x));;
 >  nsc := Set(NaiveShortCosets(A7, L7, t), x -> RightCoset(L7, x));;
-> od;
+>  return sc = nsc;
+>  end);
+true
