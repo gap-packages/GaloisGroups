@@ -155,35 +155,45 @@ end);
 # group Transitive(d,i)
 InstallGlobalFunction(GaloisDescentTable,
 function(d,filename...)
-  local first,ffirst,i,j,k,g,t,q,qq,cH,P,G,H;
+  local first,filename_gap,filename_gp,ffirst,i,j,k,g,t,q,qq,cH,P,G,H;
   if Size(filename) = 0 then
-  filename := "*stdout*";
+    filename_gap := "*stdout*";
+    filename_gp := "/dev/null";
   elif Size(filename) = 1 then
-    filename := filename[1];
+    filename_gap := Concatenation(filename[1], "-gap");
+    filename_gp := Concatenation(filename[1], "-gp");
+  elif Size(filename) = 2 then
+    filename_gap := filename[1];
+    filename_gp := filename[2];
   else
     Error("wrong argument lists");
   fi;
-  PrintTo(filename);   # delete everything
+  PrintTo(filename_gap);   # delete everything
+  PrintTo(filename_gp);    # delete everything
   t := TransitiveMaximalSubgroups(d);
   P := PartitionsByDegree(d);
   for i in [1..NrTransitiveGroups(d)] do
     G := TransitiveGroup(d,i);
     # 1. fancy group name
-    AppendTo(filename, "[\"", ViewString(G), "\",[");
+    AppendTo(filename_gap, "[\"", ViewString(G), "\",[");
+    AppendTo(filename_gp, "[\"", ViewString(G), "\",[");
     # 3. generators (PARI/GP format)
     first := true;
     for g in GeneratorsOfGroup(G) do
       if not first then
-        AppendTo(filename,",");
+        AppendTo(filename_gap,",");
+        AppendTo(filename_gp,",");
       fi;
-      AppendTo(filename, PermToGP(g,d));
-#      AppendTo(filename, g);
+      AppendTo(filename_gap, g);
+      AppendTo(filename_gp, PermToGP(g,d));
       first := false;
     od;
-    AppendTo(filename, "]");
+    AppendTo(filename_gap, "]");
+    AppendTo(filename_gp, "]");
     # 4. list of subgroups
     first := true;
-    AppendTo(filename, ",[");
+    AppendTo(filename_gap, ",[");
+    AppendTo(filename_gp, ",[");
     for j in [1..Size(t[2][i])] do
       k := t[2][i][j];
       G := TransitiveGroup(d, i);
@@ -200,23 +210,28 @@ function(d,filename...)
 
       q := MonomialMinimalDegree(G, H, P);
       if not first then
-        AppendTo(filename , ",");
+        AppendTo(filename_gap, ",");
+        AppendTo(filename_gp, ",");
+
       fi;
 
-      AppendTo(filename, "[", k, ",", PermToGP(cH, d), ",[");
-#      AppendTo(filename, "[", k, ",", cH, ",[");
+      AppendTo(filename_gap, "[", k, ",", cH, ",[");
+      AppendTo(filename_gp, "[", k, ",", PermToGP(cH, d), ",[");
       ffirst := true;
       for qq in AllMonomials(G,H,q) do
         if not ffirst then
-          AppendTo(filename, ",");
+          AppendTo(filename_gap, ",");
+          AppendTo(filename_gp, ",");
         fi;
-        AppendTo(filename, FlatMonomial(qq[2]));
-#        AppendTo(filename, [qq[1], qq[2]]);
+        AppendTo(filename_gap, qq[2]);
+        AppendTo(filename_gp, FlatMonomial(qq[2]));
         ffirst := false;
       od;
-      AppendTo(filename, "]]");
+      AppendTo(filename_gap, "]]");
+      AppendTo(filename_gp, "]]");
       first := false;
     od;
-    AppendTo(filename, "]]\n");
+    AppendTo(filename_gap, "]]\n");
+    AppendTo(filename_gp, "]]\n");
   od;
 end);
