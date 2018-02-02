@@ -13,7 +13,7 @@ end;
 InstallGlobalFunction(RelativeInvariantMinimalDegree,
 function(G, H)
   local fG, fH, vG, vH, n;
-  if NrMovedPoints(G) <> NrMovedPoints(H) then
+  if MovedPoints(G) <> MovedPoints(H) then
     Error("G and H have different domains");
   fi;
   fG := MolienSeries(NaturalCharacter(G));
