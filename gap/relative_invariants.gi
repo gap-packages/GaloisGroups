@@ -7,7 +7,7 @@
 #
 
 PermToGP := function(p,l)
-  return Permuted([1..l],p);
+  return Permuted([1..l],p^-1);
 end;
 
 InstallGlobalFunction(RelativeInvariantMinimalDegree,
@@ -143,65 +143,80 @@ function(G, H, q)
   o := Orbit(G, q, OnTuplesSets);
   L := [];
   for k in Orbits(H, o, OnTuplesSets) do
-    Add(L, Minimum(k));
+    Add(L, [Size(k),Minimum(k)]);
   od;
   return L;
 end);
 
 # Write canonical factorization for transitive subgroups
 # of Sd into files.
+#
+# The format is the following: the line i corresponds to the
+# group Transitive(d,i)
 InstallGlobalFunction(GaloisDescentTable,
-function(d,filename)
+function(d,filename...)
   local first,ffirst,i,j,k,g,t,q,qq,cH,P,G,H;
+  if Size(filename) = 0 then
+  filename := "*stdout*";
+  elif Size(filename) = 1 then
+    filename := filename[1];
+  else
+    Error("wrong argument lists");
+  fi;
   PrintTo(filename);   # delete everything
   t := TransitiveMaximalSubgroups(d);
   P := PartitionsByDegree(d);
   for i in [1..NrTransitiveGroups(d)] do
     G := TransitiveGroup(d,i);
+    # 1. fancy group name
     AppendTo(filename, "[\"", ViewString(G), "\",[");
+    # 3. generators (PARI/GP format)
     first := true;
     for g in GeneratorsOfGroup(G) do
       if not first then
         AppendTo(filename,",");
       fi;
       AppendTo(filename, PermToGP(g,d));
+#      AppendTo(filename, g);
       first := false;
     od;
     AppendTo(filename, "]");
+    # 4. list of subgroups
     first := true;
-    if Size(t[2][i]) <> 0 then
-      AppendTo(filename, ",");
-    fi;
+    AppendTo(filename, ",[");
     for j in [1..Size(t[2][i])] do
       k := t[2][i][j];
-      # Ignore the case Sd -> Ad
-      if i = NrTransitiveGroups(d) and k = i-1 then
-        continue;
-      fi;
-
       G := TransitiveGroup(d, i);
       H := t[3][i][j][1];
       cH := t[3][i][j][2];
       if H^cH <> TransitiveGroup(d,k) then
         Error("pb");
       fi;
+
+      # Ignore the case Sign(G) <> Sign(H)
+      if SignPermGroup(G) <> SignPermGroup(H) then
+        continue;
+      fi;
+
       q := MonomialMinimalDegree(G, H, P);
-      Print("q=",q,"\n");
       if not first then
         AppendTo(filename , ",");
       fi;
+
       AppendTo(filename, "[", k, ",", PermToGP(cH, d), ",[");
+#      AppendTo(filename, "[", k, ",", cH, ",[");
       ffirst := true;
       for qq in AllMonomials(G,H,q) do
         if not ffirst then
           AppendTo(filename, ",");
         fi;
-        AppendTo(filename, FlatMonomial(qq));
+        AppendTo(filename, FlatMonomial(qq[2]));
+#        AppendTo(filename, [qq[1], qq[2]]);
         ffirst := false;
       od;
       AppendTo(filename, "]]");
       first := false;
     od;
-    AppendTo(filename, "]\n");
+    AppendTo(filename, "]]\n");
   od;
 end);
