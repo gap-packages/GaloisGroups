@@ -19,22 +19,30 @@ Persons := [
                   IsMaintainer := true,
                   FirstNames := "Bill",
                   LastName := "Allombert",
-                  WWWHome := "TODO",
+                  WWWHome := "https://www.math.u-bordeaux.fr/~ballombe/",
                   Email := "Bill.Allombert@math.u-bordeaux.fr",
-                  PostalAddress := "TODO",
+                  PostalAddress := Concatenation(
+                                                 "IMB, UMR XXX",
+                                                 "Bâtiment A33"
+                                                 ),
                   Place := "Bordeaux",
-                  Institution := "TODO",
+                  Institution := "CNRS/Université de Bordeaux",
                  ),
              rec(
                   IsAuthor := true,
                   IsMaintainer := true,
                   FirstNames := "Vincent",
                   LastName := "Delecroix",
-                  WWWHome := "TODO",
+                  WWWHome := "http://www.labri.fr/perso/vdelecro/",
                   Email := "vincent.delecroix@u-bordeaux.fr",
-                  PostalAddress := "TODO",
+                  PostalAddress := Concatenation(
+                                                 "LaBRI, UMR 5800",
+                                                 "Bâtiment A30",
+                                                 "351, cours de la Libération",
+                                                 "33405 Talence cedex",
+                                                 "FRANCE"),
                   Place := "Bordeaux",
-                  Institution := "Universite de Bordeaux",
+                  Institution := "CNRS/Université de Bordeaux",
                  ),
              
              rec(
@@ -54,6 +62,7 @@ Persons := [
                   Institution := "University of St Andrews",
                  ),
 ],
+
 
 SourceRepository := rec(
     Type := "git",
