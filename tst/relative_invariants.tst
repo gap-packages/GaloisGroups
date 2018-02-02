@@ -15,3 +15,7 @@ gap> RelativeInvariantMinimalDegree(G, H);
 [ 2, 4 ]
 gap> MonomialMinimalDegree(G,H,PartitionsByDegree(11));
 [ [ 1, 2 ] ]
+gap> FlatMonomial([[1], [2,3]]);
+[ 1, 2, 2, 3, 3 ]
+gap> FlatMonomial([[1], [3], [2]]);
+[ 1, 3, 3, 2, 2, 2 ]
