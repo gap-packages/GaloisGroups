@@ -24,8 +24,7 @@ Please submit bug reports and feature requests via our GitHub issue tracker:
   <https://github.com/gap-packages/GaloisGroups/issues>
 
 
-License
-=======
+## License
 
 GaloisGroups is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by the
@@ -34,3 +33,13 @@ option) any later version.
 
 For details see the files COPYRIGHT.md and LICENSE.
 
+
+## TODO
+
+- given a transitive subgroup G, we need to iterate over all subgroups
+  in between Stabilizer(G,1) and G.
+
+- TuplesSetsTuplesSets action (corresponding to permutation action
+  on multivariate polynomials)
+
+- PARI/GP interface
