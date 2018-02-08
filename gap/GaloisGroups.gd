@@ -6,4 +6,4 @@
 
 #! @Description
 #!   The galois group of a polynomial
-DeclareAttribute( "GaloisGroup", IsPolynomialFunction );
+DeclareGlobalFunction( "GaloisGroup2" );
