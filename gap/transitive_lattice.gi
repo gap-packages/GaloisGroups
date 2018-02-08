@@ -91,10 +91,32 @@ function(deg)
     return [DigraphByEdges(edges), graph];
 end);
 
-# FIXME: Reference is algorithm 4.6 from Klüners/Fieker "Computing Galois Groups"
-InstallGlobalFunction(BlockLadder,
-function(grp, omega, a)
-    local  b, i, H;
-        
-end);
+# Return the list of indices [G:H] for maximal subgroups H that strictly contains
+# the Stabilizer(G, 1).
+# TODO: we actually want *all* subgroups sandwiced between Stabilizer(G,1) and G
+#       and not only the maximal ones... don't know how to do
+DegreesMaximalStabilizer := function(G)
+  local S,H,L,i,g;
+  L := [];
+  S := Stabilizer(G, 1);
+  for H in MaximalSubgroupClassReps(G) do
+    if Size(H) <= Size(S) then
+      continue;
+    fi;
+
+    i := Index(G, H);
+    for g in RightTransversal(G, Normalizer(G,H)) do
+      if IsSubgroup(H^g, S) then
+          Add(L, i);
+      fi;
+    od;
+  od;
+  return SortedList(L);
+end;
+
+# TODO: we actually want *all* subgroups and not only the maximal ones!
+StabilizerData := function(d)
+  local G;
+  return List(AllTransitiveGroups(NrMovedPoints, d), G->DegreesMaximalStabilizer(G));
+end;
 
