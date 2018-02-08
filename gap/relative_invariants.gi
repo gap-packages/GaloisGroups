@@ -42,7 +42,7 @@ end);
 # gap> SizesToSetPartition([3,1,1]);
 # [ [ 1 ], [ 2 ] ]
 # gap> SizesToSetPartition([1,1,2,1]);
-# 
+#
 SizesToSetPartition := function(p)
   local j,k,part;
   k := 1;
@@ -148,55 +148,41 @@ function(G, H, q)
   return L;
 end);
 
-# Write canonical factorization for transitive subgroups
-# of Sd into files.
+# Compute data associated to the transitive subgroups in SymmetricGroup(d)
+# the i-th list corresponds to the group TransitiveGroup(d,i) as follows
+#   line[1] : name
+#   line[2] : list of generators
+#   line[3] : data corresponding to maximal subgroups
 #
-# The format is the following: the line i corresponds to the
-# group Transitive(d,i)
+# the data for maximal subgroups is a list of the following form
+#
+#   subg[1] : index of the subgroup in the databse
+#   subg[2] : a list of pairs [n, t] where n is an integer and t
+#             an ordered set partition
 InstallGlobalFunction(GaloisDescentTable,
-function(d,filename...)
-  local first,filename_gap,filename_gp,ffirst,i,j,k,g,t,q,qq,cH,P,G,H;
-  if Size(filename) = 0 then
-    filename_gap := "*stdout*";
-    filename_gp := "/dev/null";
-  elif Size(filename) = 1 then
-    filename_gap := Concatenation(filename[1], "-gap");
-    filename_gp := Concatenation(filename[1], "-gp");
-  elif Size(filename) = 2 then
-    filename_gap := filename[1];
-    filename_gp := filename[2];
-  else
-    Error("wrong argument lists");
-  fi;
-  PrintTo(filename_gap);   # delete everything
-  PrintTo(filename_gp);    # delete everything
+function(d)
+  local L,t,P,i,j,G,gr,subg,subgs,k,H,cH,q;
+  L := [];
   t := TransitiveMaximalSubgroups(d);
   P := PartitionsByDegree(d);
+  if Size(t[2]) <> NrTransitiveGroups(d) or Size(t[3]) <> NrTransitiveGroups(d) then
+    Error("wrong assumption");
+  fi;
   for i in [1..NrTransitiveGroups(d)] do
     G := TransitiveGroup(d,i);
-    # 1. fancy group name
-    AppendTo(filename_gap, "[\"", ViewString(G), "\",[");
-    AppendTo(filename_gp, "[\"", ViewString(G), "\",[");
-    # 3. generators (PARI/GP format)
-    first := true;
-    for g in GeneratorsOfGroup(G) do
-      if not first then
-        AppendTo(filename_gap,",");
-        AppendTo(filename_gp,",");
-      fi;
-      AppendTo(filename_gap, g);
-      AppendTo(filename_gp, PermToGP(g,d));
-      first := false;
-    od;
-    AppendTo(filename_gap, "]");
-    AppendTo(filename_gp, "]");
-    # 4. list of subgroups
-    first := true;
-    AppendTo(filename_gap, ",[");
-    AppendTo(filename_gp, ",[");
+    gr := [];
+
+    # 1 group string
+    Add(gr, ViewString(G));
+
+    # 2. generators
+    Add(gr, GeneratorsOfGroup(G));
+
+    # 3. list of subgroups
+    subgs := [];
     for j in [1..Size(t[2][i])] do
+      subg := [];
       k := t[2][i][j];
-      G := TransitiveGroup(d, i);
       H := t[3][i][j][1];
       cH := t[3][i][j][2];
       if H^cH <> TransitiveGroup(d,k) then
@@ -208,30 +194,93 @@ function(d,filename...)
         continue;
       fi;
 
+      # 3.a conjugation
+      Add(subg, k);
+      Add(subg, cH);
+
+      # 3.b monomials
       q := MonomialMinimalDegree(G, H, P);
-      if not first then
-        AppendTo(filename_gap, ",");
-        AppendTo(filename_gp, ",");
+      Add(subg, AllMonomials(G, H, q));
 
-      fi;
-
-      AppendTo(filename_gap, "[", k, ",", cH, ",[");
-      AppendTo(filename_gp, "[", k, ",", PermToGP(cH, d), ",[");
-      ffirst := true;
-      for qq in AllMonomials(G,H,q) do
-        if not ffirst then
-          AppendTo(filename_gap, ",");
-          AppendTo(filename_gp, ",");
-        fi;
-        AppendTo(filename_gap, qq[2]);
-        AppendTo(filename_gp, FlatMonomial(qq[2]));
-        ffirst := false;
-      od;
-      AppendTo(filename_gap, "]]");
-      AppendTo(filename_gp, "]]");
-      first := false;
+      Add(subgs, subg);
     od;
-    AppendTo(filename_gap, "]]\n");
-    AppendTo(filename_gp, "]]\n");
+
+    Add(gr, subgs);
+    Add(L, gr);
   od;
+
+  return L;
 end);
+
+ListAppendToNoSpace := function(filename, L)
+  local x,first;
+  first := true;
+  AppendTo(filename, "[");
+  for x in L do
+    if not first then
+      AppendTo(filename, ",");
+    fi;
+    if IsString(x) and Size(x) <> 0 then
+      AppendTo(filename, "\"", x, "\"");
+    elif IsList(x) then
+      ListAppendToNoSpace(filename, x);
+    else
+      AppendTo(filename, x);
+    fi;
+    first := false;
+  od;
+  AppendTo(filename, "]");
+end;
+
+# Write canonical factorization for transitive subgroups
+# of Sd into files.
+#
+# The format is the following: the line i corresponds to the
+# group Transitive(d,i)
+PrintGaloisDescentTable := function(T, filename...)
+  local line;
+  if Size(filename) = 0 then
+    filename := "*stdout*";
+  elif Size(filename) = 1 then
+    filename := filename[1];
+  else
+    Error("wrong argument lists");
+  fi;
+  PrintTo(filename);   # delete everything
+
+  if IsInt(T) then
+    T := GaloisDescentTable(T);
+  fi;
+
+  for line in T do
+    ListAppendToNoSpace(filename, line);
+    AppendTo(filename, "\n");
+  od;
+end;
+
+PrintGaloisDescentTableGP := function(T, filename...)
+  local d, line, G;
+  if Size(filename) = 0 then
+    filename := "*stdout*";
+  elif Size(filename) = 1 then
+    filename := filename[1];
+  else
+    Error("wrong argument lists");
+  fi;
+  PrintTo(filename);   # delete everything
+
+  if IsInt(T) then
+    d := T;
+    T := GaloisDescentTable(T);
+  else
+    G := Group(T[Size(T)][2]); # should be S_d
+    d := NrMovedPoints(G);
+  fi;
+
+  for line in T do
+    line[2] := List(line[2], x->PermToGP(x,d));
+    line[3] := List(line[3], x->[x[1], PermToGP(x[2],d), List(x[3], y->FlatMonomial(y[2]))]);
+    ListAppendToNoSpace(filename, line);
+    AppendTo(filename, "\n");
+  od;
+end;
