@@ -10,6 +10,7 @@ PermToGP := function(p,l)
   return Permuted([1..l],p^-1);
 end;
 
+
 InstallGlobalFunction(RelativeInvariantMinimalDegree,
 function(G, H)
   local fG, fH, vG, vH, n;
@@ -79,19 +80,6 @@ PartitionsByDegree := function(d)
     fi;
   od;
   return L;
-end;
-
-FlatMonomial := function(p)
-  local i, j, k, q;
-  q := [];
-  for i in [1..Size(p)] do
-    for j in [1..Size(p[i])] do
-      for k in [1..i] do
-        Add(q, p[i][j]);
-      od;
-    od;
-  od;
-  return q;
 end;
 
 # Return a monomial of minimal degree that gives
@@ -258,29 +246,29 @@ PrintGaloisDescentTable := function(T, filename...)
   od;
 end;
 
-PrintGaloisDescentTableGP := function(T, filename...)
-  local d, line, G;
-  if Size(filename) = 0 then
-    filename := "*stdout*";
-  elif Size(filename) = 1 then
-    filename := filename[1];
-  else
-    Error("wrong argument lists");
-  fi;
-  PrintTo(filename);   # delete everything
-
-  if IsInt(T) then
-    d := T;
-    T := GaloisDescentTable(T);
-  else
-    G := Group(T[Size(T)][2]); # should be S_d
-    d := NrMovedPoints(G);
-  fi;
-
-  for line in T do
-    line[2] := List(line[2], x->PermToGP(x,d));
-    line[3] := List(line[3], x->[x[1], PermToGP(x[2],d), List(x[3], y->FlatMonomial(y[2]))]);
-    ListAppendToNoSpace(filename, line);
-    AppendTo(filename, "\n");
-  od;
-end;
+#PrintGaloisDescentTableGP := function(T, filename...)
+#  local d, line, G;
+#  if Size(filename) = 0 then
+#    filename := "*stdout*";
+#  elif Size(filename) = 1 then
+#    filename := filename[1];
+#  else
+#    Error("wrong argument lists");
+#  fi;
+#  PrintTo(filename);   # delete everything
+#
+#  if IsInt(T) then
+#    d := T;
+#    T := GaloisDescentTable(T);
+#  else
+#    G := Group(T[Size(T)][2]); # should be S_d
+#    d := NrMovedPoints(G);
+#  fi;
+#
+#  for line in T do
+#    line[2] := List(line[2], x->PermToGP(x,d));
+#    line[3] := List(line[3], x->[x[1], PermToGP(x[2],d), List(x[3], y->FlatMonomial(y[2]))]);
+#    ListAppendToNoSpace(filename, line);
+#    AppendTo(filename, "\n");
+#  od;
+#end;

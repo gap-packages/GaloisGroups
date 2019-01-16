@@ -105,7 +105,9 @@ Dependencies := rec(
   NeededOtherPackages := [ [ "GAPDoc", ">= 1.6" ]
                          , [ "Digraphs", ">= 0.11" ]
                          , [ "ferret", ">= 0.8.0" ]
-                         , [ "alnuth", ">= 3.1.0" ] ],
+                         , [ "alnuth", ">= 3.1.0" ]
+                         , [ "TransGrp", ">= 2.0.4" ]
+                         , [ "PARIInterface", ">= 0.1" ] ],
   SuggestedOtherPackages := [ ],
   ExternalConditions := [ ],
 ),
