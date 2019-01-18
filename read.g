@@ -4,7 +4,8 @@
 # Reading the implementation part of the package.
 #
 
-ReadPackage( "GaloisGroups", "gap/short_cosets.gi");
-ReadPackage( "GaloisGroups", "gap/transitive_lattice.gi");
-ReadPackage( "GaloisGroups", "gap/GaloisGroups.gi");
-ReadPackage( "GaloisGroups", "gap/relative_invariants.gi");
+ReadPackage("GaloisGroups", "gap/short_cosets.gi");
+ReadPackage("GaloisGroups", "gap/transitive_lattice.gi");
+ReadPackage("GaloisGroups", "gap/GaloisGroups.gi");
+ReadPackage("GaloisGroups", "gap/relative_invariants.gi");
+ReadPackage("GaloisGroups", "gap/table.gi");

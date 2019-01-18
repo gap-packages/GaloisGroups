@@ -131,7 +131,7 @@ function(G, H, q)
   o := Orbit(G, q, OnTuplesSets);
   L := [];
   for k in Orbits(H, o, OnTuplesSets) do
-    Add(L, [Size(k),Minimum(k)]);
+    Add(L, [Size(k), Minimum(k)]);
   od;
   return L;
 end);
@@ -147,9 +147,19 @@ end);
 #   subg[1] : index of the subgroup in the databse
 #   subg[2] : a list of pairs [n, t] where n is an integer and t
 #             an ordered set partition
+
+CachedGaloisDescentTable := [];
+
 InstallGlobalFunction(GaloisDescentTable,
 function(d)
   local L,t,P,i,j,G,gr,subg,subgs,k,H,cH,q;
+  if not IsInt(d) or d <= 1 then
+    Error("invalid d parameter");
+  fi;
+  if IsBound(CachedGaloisDescentTable[d]) then
+    return CachedGaloisDescentTable[d];
+  fi;
+
   L := [];
   t := TransitiveMaximalSubgroups(d);
   P := PartitionsByDegree(d);
@@ -197,6 +207,7 @@ function(d)
     Add(L, gr);
   od;
 
+  CachedGaloisDescentTable[d] := L;
   return L;
 end);
 

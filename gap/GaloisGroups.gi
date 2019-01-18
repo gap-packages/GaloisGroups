@@ -18,27 +18,28 @@ GPToPerm := function(l)
   return AsPermutation(Transformation(l));
 end;
 
-PermToGP := function(p,l)
-  return Permuted([1..l],p^-1);
+PermToGP := function(p, l)
+  return Permuted([1..l], p^-1);
 end;
 
-GPGetRoots := function(P)
-  return PARI_CALL2("getroots",PARIPolynomial(P),INT_TO_PARI_GEN(100));
+PARIGetRoots := function(P)
+  return PARI_CALL2("getroots", PARIPolynomial(P), INT_TO_PARI_GEN(100));
 end;
 
 GPTschirnhaus := function(P)
   local Q;
-  Q := PARI_CALL1("tschirnhaus",PARIPolynomial(P));
-  return UnivariatePolynomial(Rationals,PARI_GEN_GET_DATA(Q));
+  Q := PARI_CALL1("tschirnhaus", PARIPolynomial(P));
+  return UnivariatePolynomial(Rationals, PARI_GEN_GET_DATA(Q));
 end;
 
-GPGetFrobenius := function(Q)
-  return GPToPerm(PARI_GEN_GET_DATA(PARI_CALL1("getperm",Q)));
+PARIGetFrobenius := function(Q)
+  return GPToPerm(PARI_GEN_GET_DATA(PARI_CALL1("getperm", Q)));
 end;
 
-GPCosets3 := function(C,K,Q,P)
+# evaluation of resolvent... what is this function doing?
+PARICosets3 := function(C, K, Q, P)
   local r;
-  r := PARI_GEN_GET_DATA(PARI_CALL4("cosets3",PARI_VECVECSMALL(C),PARI_VECVECVECSMALL(K),Q,PARIPolynomial(P)));
+  r := PARI_GEN_GET_DATA(PARI_CALL4("cosets3", PARI_VECVECSMALL(C), PARI_VECVECVECSMALL(K), Q, PARIPolynomial(P)));
   if IsList(r) then
     return GPToPerm(r);
   else
@@ -137,12 +138,12 @@ end;
 #end );
 
 
-GaloisFromTable:= function(P,Ta)
+GaloisFromTable:= function(P, Ta)
   local d, T, s, Q, C, l, a, rho, tau, sigma, name, gen, list, b, bloc, K, frob, G, H, blocGP;
-  Q := GPGetRoots(P);
-  frob := GPGetFrobenius(Q);
+  Q := PARIGetRoots(P);
+  frob := PARIGetFrobenius(Q);
   d := Degree(P);
-  T := List(Ta, x-> x[3]);
+  T := List(Ta, x->x[3]);
   if IsSquareInt(Discriminant(P)) then
     a := Length(T)-1; #A_n
   else
@@ -159,7 +160,7 @@ GaloisFromTable:= function(P,Ta)
       C := List(ShortCosets(H, G, frob), c->PermToGP(c, d));
       K := List(bloc,bl->Orbit(G, OnTuplesSets(bl, sigma), OnTuplesSets));
       K := List(K, y->SortedList(List(y, FlatMonomial)));
-      rho := GPCosets3(C, K, Q, P);
+      rho := PARICosets3(C, K, Q, P);
       if IsPerm(rho) then
         sigma := tau^-1*sigma*rho;
         a := b;

@@ -3,11 +3,11 @@
 #
 # Reading the declaration part of the package.
 #
-_PATH_SO:=Filename(DirectoriesPackagePrograms("GaloisGroups"), "GaloisGroups.so");
-if _PATH_SO <> fail then
-    LoadDynamicModule(_PATH_SO);
-fi;
-Unbind(_PATH_SO);
+#_PATH_SO:=Filename(DirectoriesPackagePrograms("GaloisGroups"), "GaloisGroups.so");
+#if _PATH_SO <> fail then
+#    LoadDynamicModule(_PATH_SO);
+#fi;
+#Unbind(_PATH_SO);
 
 ReadPackage( "GaloisGroups", "gap/short_cosets.gd");
 ReadPackage( "GaloisGroups", "gap/transitive_lattice.gd");
