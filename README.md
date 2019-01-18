@@ -4,9 +4,11 @@
 
 # The GAP 4 package `GaloisGroups'
 
-
 An implementation of Fieker and Klüners algorithm to compute galois groups
 as described in https://arxiv.org/pdf/1211.3588.pdf
+
+For arithmetic computations it relies on PARI/GP called via the
+PARIInterface package.
 
 ## Documentation
 
@@ -33,6 +35,11 @@ option) any later version.
 
 For details see the files COPYRIGHT.md and LICENSE.
 
+## Testing
+
+Tests are implemented in tst/. To run them do
+
+    $ {GAP} tst/testall.g
 
 ## TODO
 
@@ -42,4 +49,3 @@ For details see the files COPYRIGHT.md and LICENSE.
 - TuplesSetsTuplesSets action (corresponding to permutation action
   on multivariate polynomials)
 
-- PARI/GP interface
