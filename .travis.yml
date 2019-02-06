@@ -4,13 +4,14 @@ env:
   global:
     - GAPROOT=gaproot
     - COVDIR=coverage
-    - GAP_PKGS_TO_CLONE="ferret"
-    - GAP_PKGS_TO_BUILD="io profiling ferret digraphs"
+    - GAP_PKGS_TO_CLONE="ferret PARIInterface"
+    - GAP_PKGS_TO_BUILD="io profiling ferret digraphs PARIInterface"
 
 addons:
   apt_packages:
     - libgmp-dev
     - libreadline-dev
+    - libpari-dev # for PARIInterface
 
 matrix:
   include:
