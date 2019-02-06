@@ -12,8 +12,9 @@ GAPINSTALLLIB = $(BINARCHDIR)/GaloisGroups.so
 lib_LTLIBRARIES = GaloisGroups.la
 
 GaloisGroups_la_SOURCES = src/GaloisGroups.c
-GaloisGroups_la_CPPFLAGS = $(GAP_CPPFLAGS) -DCONFIG_H
-GaloisGroups_la_LDFLAGS = -module -avoid-version
+GaloisGroups_la_CPPFLAGS = $(GAP_CPPFLAGS)
+GaloisGroups_la_CFLAGS = $(GAP_CFLAGS)
+GaloisGroups_la_LDFLAGS = $(GAP_LDFLAGS) -module -avoid-version
 if SYS_IS_CYGWIN
 GaloisGroups_la_LDFLAGS += -no-undefined -version-info 0:0:0 
 GaloisGroups_la_LDFLAGS += -Wl,$(GAPROOT)/bin/$(GAPARCH)/gap.dll
