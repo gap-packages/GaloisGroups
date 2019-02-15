@@ -12,6 +12,7 @@ PackageName := "GaloisGroups",
 Subtitle := "Computing Galois Groups using GAP and PARI",
 Version := "0.1",
 Date := "31/01/2018", # dd/mm/yyyy format
+License := "GPL-2.0-or-later",
 
 Persons := [
              rec(
