@@ -47,6 +47,14 @@ PARICosets3 := function(C, K, Q, P)
   fi;
 end;
 
+
+# Examples:
+#
+# gap> FlatMonomial([[1,2,3]]);
+#[  1, 2, 3 ]
+# gap> FlatMonomial([[1,2,3],[4,5,6]]);
+# [ 1, 2, 3, 4, 4, 5, 5, 6, 6 ]
+#
 FlatMonomial := function(p)
   local i, j, k, q;
   q := [];
@@ -155,8 +163,11 @@ GaloisFromTable:= function(P, Ta)
     rho := 0;
     for l in list do
       b := l[1]; tau := l[2]; bloc := List(l[3], x->x[2]);
+      # current group
       G := TransitiveGroup(d,b)^(tau^-1*sigma);
+      # subgroup to be tested
       H := TransitiveGroup(d,a)^sigma;
+      # short cosets of G/H (wrt the Frobenius permutation)
       C := List(ShortCosets(H, G, frob), c->PermToGP(c, d));
       K := List(bloc,bl->Orbit(G, OnTuplesSets(bl, sigma), OnTuplesSets));
       K := List(K, y->SortedList(List(y, FlatMonomial)));

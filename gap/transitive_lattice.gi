@@ -93,7 +93,7 @@ end);
 
 # Return the list of indices [G:H] for maximal subgroups H that strictly contains
 # the Stabilizer(G, 1).
-# TODO: we actually want *all* subgroups sandwiced between Stabilizer(G,1) and G
+# TODO: we actually want *all* subgroups sandwiched between Stabilizer(G,1) and G
 #       and not only the maximal ones... don't know how to do
 DegreesMaximalStabilizer := function(G)
   local S,H,L,i,g;

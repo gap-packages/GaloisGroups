@@ -91,11 +91,10 @@ end;
 # where I1 is the product of the variables indexed
 # by I1.
 MonomialMinimalDegree := function(G, H, P)
-  local d,p,q,s,n,dim,sG,sH,S;
+  local d,p,q,s,n,sG,sH,S;
   d := NrMovedPoints(G);
   s := RelativeInvariantMinimalDegree(G, H);
   n := s[1];
-  dim := s[2];
 
   # try the naive monomial
   for p in P[n] do
@@ -145,7 +144,8 @@ end);
 # the data for maximal subgroups is a list of the following form
 #
 #   subg[1] : index of the subgroup in the databse
-#   subg[2] : a list of pairs [n, t] where n is an integer and t
+#   subg[2] : a permutation such that conjugates
+#   subg[3] : a list of pairs [n, t] where n is an integer and t
 #             an ordered set partition
 
 CachedGaloisDescentTable := [];
@@ -256,6 +256,8 @@ PrintGaloisDescentTable := function(T, filename...)
     AppendTo(filename, "\n");
   od;
 end;
+
+
 
 #PrintGaloisDescentTableGP := function(T, filename...)
 #  local d, line, G;
