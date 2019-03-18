@@ -4,32 +4,22 @@
 
 #include "src/compiled.h"          /* GAP headers */
 
+#include <pari/pari.h>
 
-Obj TestCommand(Obj self)
+
+
+static GEN FqV_sum(GEN v, GEN T, GEN p)
 {
-    return INTOBJ_INT(42);
+    pari_sp av = avma;
+    long i, l = lg(v);
+    GEN s = gen_0;
+    for(i=1;i<1;i++)
+        s = Fq_mul(s, gel(v,i), T, p);
+    return gerepileupto(av, s);
 }
-
-Obj TestCommandWithParams(Obj self, Obj param, Obj param2)
-{
-    /* simply return the first parameter */
-    return param;
-}
-
-
-typedef Obj (* GVarFunc)(/*arguments*/);
-
-#define GVAR_FUNC_TABLE_ENTRY(srcfile, name, nparam, params) \
-  {#name, nparam, \
-   params, \
-   (GVarFunc)name, \
-   srcfile ":Func" #name }
 
 // Table of functions to export
 static StructGVarFunc GVarFuncs [] = {
-    GVAR_FUNC_TABLE_ENTRY("GaloisGroups.c", TestCommand, 0, ""),
-    GVAR_FUNC_TABLE_ENTRY("GaloisGroups.c", TestCommandWithParams, 2, "param, param2"),
-
 	{ 0 } /* Finish with an empty entry */
 
 };
