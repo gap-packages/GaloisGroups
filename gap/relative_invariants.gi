@@ -6,11 +6,6 @@
 # basis of H-invariant ones.
 #
 
-PermToGP := function(p,l)
-  return Permuted([1..l],p^-1);
-end;
-
-
 InstallGlobalFunction(RelativeInvariantMinimalDegree,
 function(G, H)
   local fG, fH, vG, vH, n;
@@ -258,7 +253,12 @@ PrintGaloisDescentTable := function(T, filename...)
 end;
 
 
-
+#
+#PermToGP := function(p,l)
+#  return Permuted([1..l],p^-1);
+#end;
+#
+#
 #PrintGaloisDescentTableGP := function(T, filename...)
 #  local d, line, G;
 #  if Size(filename) = 0 then

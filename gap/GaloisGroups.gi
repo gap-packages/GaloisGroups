@@ -22,11 +22,26 @@ PermToGP := function(p, l)
   return Permuted([1..l], p^-1);
 end;
 
+# Call the pari getroots function
+# return an approximation of the roots of the polynomial P
+# (for now hardcoded with precision 100)
+#
+# Examples:
+#
+# gap> GetRoots(x^5-2);
+# PARI([[1891, 1036*y + 1033, 3146*y + 1697, 23*y + 1720, 2133*y + 3166]~, y^2 + y + 2, 3169])
+#
 PARIGetRoots := function(P)
   return PARI_CALL2("getroots", PARIPolynomial(P), INT_TO_PARI_GEN(100));
 end;
 
-GPTschirnhaus := function(P)
+# Perform a random Tschirnaus transformation on P
+#
+# Examples: (though output is random)
+#
+# gap> PARITschirnhaus(x^5-2);
+# x^5+10*x^4+40*x^3-40*x^2-940*x-2142
+PARITschirnhaus := function(P)
   local Q;
   Q := PARI_CALL1("tschirnhaus", PARIPolynomial(P));
   return UnivariatePolynomial(Rationals, PARI_GEN_GET_DATA(Q));
@@ -36,7 +51,7 @@ PARIGetFrobenius := function(Q)
   return GPToPerm(PARI_GEN_GET_DATA(PARI_CALL1("getperm", Q)));
 end;
 
-# evaluation of resolvent... what is this function doing?
+# evaluation of resolvent... what is this function actually doing?
 PARICosets3 := function(C, K, Q, P)
   local r;
   r := PARI_GEN_GET_DATA(PARI_CALL4("cosets3", PARI_VECVECSMALL(C), PARI_VECVECVECSMALL(K), Q, PARIPolynomial(P)));
@@ -71,83 +86,19 @@ end;
 #####################################################################
 # Main function
 
-#InstallGlobalFunction( GaloisGroup2,
-#function(p)
-#  local d, a, b, sigma, tau, rho, frob, G, H, blocks, C, i, j, s, k, O, subgroup;
+# Compute the Galois group by doing descent (Stauduhar method)
 #
-#  d := Degree(p);
-#  if d <> 7 then
-#    Error("not implemented yet");
-#  fi;
+# Input: P a polynomial
 #
-#  # the Frobenius should be computed from PARI/GP
-#  frob := (1,3,5,2,4,7,6);
+# Examples:
 #
-#  if SignPerm(frob) = -1 then
-#    a := NrTransitiveGroups(d);
-#  else
-#    a := NrTransitiveGroups(d) - 1;
-#  fi;
-#  sigma := ();
-#
-#  Print("frob=",frob,"\n");
-#  while true do
-#    G := TransitiveGroup(d,a)^sigma;
-#    i := fail;
-#    for subgroup in T[a][4] do
-#      b := subgroup[1];
-#      tau := subgroup[2];
-#      blocks := subgroup[3];
-#      H := TransitiveGroup(d,b)^(tau^-1*sigma);
-#
-#      Print("a = ",a," b = ", b, "\n");
-#      Print("sigma=",sigma,"\n");
-#      Print("tau=",tau,"\n");
-#
-#      C := ShortCosets(G, H, frob);
-#      i := -1;
-#      for i in [1..Size(C)] do
-#        rho := C[i];
-#        Print("  ", i, " -> ", rho, "\n");
-#        for j in [1..Size(blocks)] do
-#          s := blocks[j][1];
-#          k := blocks[j][2];
-#          O := Orbit(H^rho, OnTuplesSets(k, sigma*rho), OnTuplesSets);
-#          if Size(O) <> s then
-#            Error("wrong coset size");
-#          fi;
-#          Print("  fac", j, "=",SortedList(O), "\n");
-#        od;
-#      od;
-#
-#      # here we choose rho by asking to the user... should
-#      # use PARI/GP instead by computing the potential factors
-#      # of the resolvent obtained from O.
-#      i := -1;
-#      while not (i in [1..Size(C)] or i = fail) do
-#        i := InputFromUser("choice> ");
-#      od;
-#
-#      if i <> fail then
-#        rho := C[i];
-#        break;
-#      fi;
-#    od;
-#
-#    if i = -1 or i = fail then
-#      break;
-#    else
-#      a := b;
-#      sigma := tau^-1*sigma*rho;
-#    fi;
-#  od;
-#
-#  return [T[a][1], a, TransitiveGroup(d,a)^sigma];
-#end );
-
-
-GaloisFromTable:= function(P, Ta)
-  local d, T, s, Q, C, l, a, rho, tau, sigma, name, gen, list, b, bloc, K, frob, G, H, blocGP;
+# gap> GaloisDescentStauduhar(x^5-2);
+# [ 3, (3,4) ]
+# gap> GaloisDescentStauduhar(x^5+20*x+16);
+# [ 4, () ]
+GaloisDescentStauduhar := function(P)
+  local Ta, d, T, s, Q, C, l, a, rho, tau, sigma, name, gen, list, b, bloc, K, frob, G, H, blocGP;
+  Ta := GaloisDescentTable(Degree(P));
   Q := PARIGetRoots(P);
   frob := PARIGetFrobenius(Q);
   d := Degree(P);
@@ -178,7 +129,7 @@ GaloisFromTable:= function(P, Ta)
         break;
       elif rho = 1 then
         Print("#I Applying Tschirnhausen transform\n");
-        return GaloisFromTable(GPTschirnhaus(P), Ta);
+        return GaloisDescentStauduhar(PARITschirnhaus(P));
       fi;
     od;
   until rho = 0;
@@ -186,6 +137,6 @@ GaloisFromTable:= function(P, Ta)
 end;
 
 InstallGlobalFunction(Galois, function(P)
-  return GaloisFromTable(P, GaloisDescentTable(Degree(P)));
+  return GaloisDescentStauduhar(P);
 end);
 

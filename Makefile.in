@@ -11,8 +11,8 @@ MODULE_NAME = GaloisGroups
 SOURCES = src/GaloisGroups.c
 
 TOP = $(shell pwd)
-EXTRA_CPPFLAGS =
-EXTRA_LDFLAGS =
+EXTRA_CPPFLAGS = @EXTRA_CPPFLAGS@
+EXTRA_LDFLAGS = @EXTRA_LDFLAGS@
 EXTERN_FILES =
 
 ########################################################################

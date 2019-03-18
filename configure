@@ -4,27 +4,54 @@
 
 set -e
 
-if test -z "$1"; then
-  GAPPATH=../..; echo "Using ../.. as default GAP path";
-else
-  GAPPATH=$1;
-fi
-
-if test ! -r $GAPPATH/sysinfo.gap ; then
+function error_msg_and_quit {
+    echo $1
     echo
-    echo "No file $GAPPATH/sysinfo.gap found."
+    echo "Usage: ./configure [GAPPATH] [--with-pari PARIPATH]"
     echo
-    echo "Usage: ./configure [GAPPATH]"
-    echo "       where GAPPATH is a path to your GAP installation"
-    echo "       (The default for GAPPATH is \"../..\")"
+    echo " where"
+    echo "  - GAPPATH is a path to your GAP installation"
+    echo "    (The default for GAPPATH is \"../..\")"
     echo
-    echo "Either your GAPPATH is incorrect or the GAP it is pointing to"
-    echo "is not properly compiled (do \"./configure && make\" there first)."
+    echo "  - PARIPATH is a path to you PARI/GP installation"
+    echo "    (By default the configure script assumes that the"
+    echo "        compiler will find out itself the location)"
     echo
     echo "Aborting... No Makefile is generated."
     echo
     exit 1
+}
+
+GAPPATH=../..;
+
+while [[ $# -gt 0 ]]; do
+    key="$1"
+
+    case $key in
+        --with-pari)
+        EXTRA_CPPFLAGS="-I$2/include"
+        EXTRA_LDFLAGS="-L$2/lib"
+        if test ! -r $2/include/pari/pari.h; then
+            error_msg_and_quit "$2 does not look like a proper pari installtion tree"
+        fi
+        shift
+        shift
+        ;;
+        *)
+        GAPPATH=$1
+        shift
+        ;;
+    esac
+done
+
+if test ! -r $GAPPATH/sysinfo.gap ; then
+    error_msg_and_quit "No file $GAPPATH/sysinfo.gap found."
 fi
+
+# handle --with-pari option for custom PARI/GP installation
+# "-I/opt/pari/gp-galois/include"
+# "-L/opt/pari/gp-galois/lib"
+#
 
 echo "Using config in $GAPPATH/sysinfo.gap"
 
@@ -32,4 +59,6 @@ echo "Using config in $GAPPATH/sysinfo.gap"
 sed \
     -e "s;@GAPARCH@;$GAParch;g" \
     -e "s;@GAPPATH@;$GAPPATH;g" \
+    -e "s;@EXTRA_CPPFLAGS@;$EXTRA_CPPFLAGS;g" \
+    -e "s;@EXTRA_LDFLAGS@;$EXTRA_LDFLAGS;g" \
     Makefile.in > Makefile

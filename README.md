@@ -4,11 +4,34 @@
 
 # The GAP 4 package `GaloisGroups'
 
-An implementation of Fieker and Klüners algorithm to compute galois groups
-as described in https://arxiv.org/pdf/1211.3588.pdf
+This package implements the computation of Galois group.
 
-For arithmetic computations it relies on PARI/GP called via the
-PARIInterface package.
+For arithmetic computations, the package relies on
+[PARI/GP](http://pari.math.u-bordeaux.fr/)  called via the PARIInterface
+package.
+
+## Requirements
+
+GaloisGroups depends on other Galois packages
+
+- GAPDoc
+- Digraphs
+- ferret
+- alnuth
+- TransGrp
+- PARIInterface
+
+as well as the development version of PARI/GP (see Installation below)
+
+## Installation
+
+For the moment you need to use the development version of pari
+that implement function unavailable in PARI/GP 2.11 (e.g. `ZpXQX_liftroots`).
+If you need the compiler to know about a special location of PARI/GP runs
+configure with appropriate options
+
+    $ ./configure [GAPPATH] --with-pari [PARIPATH]
+
 
 ## Documentation
 
@@ -41,11 +64,8 @@ Tests are implemented in tst/. To run them do
 
     $ {GAP} tst/testall.g
 
-## TODO
+## References
 
-- given a transitive subgroup G, we need to iterate over all subgroups
-  in between Stabilizer(G,1) and G.
-
-- TuplesSetsTuplesSets action (corresponding to permutation action
-  on multivariate polynomials)
-
+- C. Fieker, J. Klüners "Computation of Galois groups of rational polynomials" (2014)
+- A. Hulpke "Galois groups through invariant relations" (1999)
+- A. Hulpke "Finding intermediate subgroups" (2017)
