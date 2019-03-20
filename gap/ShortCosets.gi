@@ -1,4 +1,16 @@
-#
+########################################################################
+##
+##  GaloisGroups package
+##
+##  Copyright 2018-2019
+##    Bill Allombert <bill.allombert@math.u-bordeaux.fr>
+##    Vincent Delecroix <vincent.delecroix@math.cnrs.fr>
+##    Markus Pfeiffer <markus.pfeiffer@morphism.de>
+##
+## Licensed under the GPL 2 or later.
+##
+########################################################################
+
 # TODO: Document
 #
 # here is an example

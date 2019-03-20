@@ -98,7 +98,7 @@ PackageDoc := rec(
   HTMLStart := "doc/chap0.html",
   PDFFile   := "doc/manual.pdf",
   SixFile   := "doc/manual.six",
-  LongTitle := "Computing Galois Groups using GAP and PARI",
+  LongTitle := "Computing Galois Groups using GAP and PARI/GP",
 ),
 
 Dependencies := rec(

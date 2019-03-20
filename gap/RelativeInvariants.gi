@@ -1,16 +1,24 @@
-# Return the pair (n, dim) so that n is the minimal degree
-# so that there exists a polynomial in Q[x1, ..., xd] of
-# degree n that is H invariant but not G invariant. The
-# second returned argument dim is the dimension of
-# the algebra of G-invariant polynomials on the
-# basis of H-invariant ones.
-#
+########################################################################
+##
+##  GaloisGroups package
+##
+##  Copyright 2018-2019
+##    Bill Allombert <bill.allombert@math.u-bordeaux.fr>
+##    Vincent Delecroix <vincent.delecroix@math.cnrs.fr>
+##    Markus Pfeiffer <markus.pfeiffer@morphism.de>
+##
+## Licensed under the GPL 2 or later.
+##
+########################################################################
 
 InstallGlobalFunction(RelativeInvariantMinimalDegree,
 function(G, H)
   local fG, fH, vG, vH, n;
   if MovedPoints(G) <> MovedPoints(H) then
     Error("G and H have different domains");
+  fi;
+  if not IsSubgroup(G, H) then
+    Error("H must be a subgroup of G");
   fi;
   fG := MolienSeries(NaturalCharacter(G));
   fH := MolienSeries(NaturalCharacter(H));
@@ -56,8 +64,6 @@ end;
 
 # Return the Partitions of d ordered by the degree of the associated
 # monomial.
-#
-# Examples
 #
 PartitionsByDegree := function(d)
   local i, p, s, L;
@@ -206,53 +212,54 @@ function(d)
   return L;
 end);
 
-ListAppendToNoSpace := function(filename, L)
-  local x,first;
-  first := true;
-  AppendTo(filename, "[");
-  for x in L do
-    if not first then
-      AppendTo(filename, ",");
-    fi;
-    if IsString(x) and Size(x) <> 0 then
-      AppendTo(filename, "\"", x, "\"");
-    elif IsList(x) then
-      ListAppendToNoSpace(filename, x);
-    else
-      AppendTo(filename, x);
-    fi;
-    first := false;
-  od;
-  AppendTo(filename, "]");
-end;
-
-# Write canonical factorization for transitive subgroups
-# of Sd into files.
+#######################################################################
+# Old code that might be recycled later on
 #
-# The format is the following: the line i corresponds to the
-# group Transitive(d,i)
-PrintGaloisDescentTable := function(T, filename...)
-  local line;
-  if Size(filename) = 0 then
-    filename := "*stdout*";
-  elif Size(filename) = 1 then
-    filename := filename[1];
-  else
-    Error("wrong argument lists");
-  fi;
-  PrintTo(filename);   # delete everything
-
-  if IsInt(T) then
-    T := GaloisDescentTable(T);
-  fi;
-
-  for line in T do
-    ListAppendToNoSpace(filename, line);
-    AppendTo(filename, "\n");
-  od;
-end;
-
-
+#ListAppendToNoSpace := function(filename, L)
+#  local x,first;
+#  first := true;
+#  AppendTo(filename, "[");
+#  for x in L do
+#    if not first then
+#      AppendTo(filename, ",");
+#    fi;
+#    if IsString(x) and Size(x) <> 0 then
+#      AppendTo(filename, "\"", x, "\"");
+#    elif IsList(x) then
+#      ListAppendToNoSpace(filename, x);
+#    else
+#      AppendTo(filename, x);
+#    fi;
+#    first := false;
+#  od;
+#  AppendTo(filename, "]");
+#end;
+#
+## Write canonical factorization for transitive subgroups
+## of Sd into files.
+##
+## The format is the following: the line i corresponds to the
+## group Transitive(d,i)
+# PrintGaloisDescentTable := function(T, filename...)
+#  local line;
+#  if Size(filename) = 0 then
+#    filename := "*stdout*";
+#  elif Size(filename) = 1 then
+#    filename := filename[1];
+#  else
+#    Error("wrong argument lists");
+#  fi;
+#  PrintTo(filename);   # delete everything
+#
+#  if IsInt(T) then
+#    T := GaloisDescentTable(T);
+#  fi;
+#
+#  for line in T do
+#    ListAppendToNoSpace(filename, line);
+#    AppendTo(filename, "\n");
+#  od;
+# end;
 #
 #PermToGP := function(p,l)
 #  return Permuted([1..l],p^-1);
