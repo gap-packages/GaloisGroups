@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 # usage: configure gappath
 # this script creates a `Makefile' from `Makefile.in'
 
