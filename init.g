@@ -13,3 +13,4 @@ ReadPackage( "GaloisGroups", "gap/ShortCosets.gd");
 ReadPackage( "GaloisGroups", "gap/TransitiveLattice.gd");
 ReadPackage( "GaloisGroups", "gap/RelativeInvariants.gd");
 ReadPackage( "GaloisGroups", "gap/GaloisGroups.gd");
+ReadPackage( "GaloisGroups", "gap/table.gd");

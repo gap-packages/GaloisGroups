@@ -8,3 +8,4 @@ ReadPackage("GaloisGroups", "gap/ShortCosets.gi");
 ReadPackage("GaloisGroups", "gap/TransitiveLattice.gi");
 ReadPackage("GaloisGroups", "gap/GaloisGroups.gi");
 ReadPackage("GaloisGroups", "gap/RelativeInvariants.gi");
+ReadPackage("GaloisGroups", "gap/table.gi");
