@@ -75,6 +75,9 @@ PARICosets3 := function(C, K, Q, P)
   fi;
 end;
 
+PARICosets_squarefree := function(C, K, Q, P)
+  return PARI_GEN_GET_DATA(PARI_CALL4("cosets_squarefree", PARI_VECVECSMALL(C), PARI_VECVECVECSMALL(K), Q, PARIPolynomial(P))) <> 0;
+end;
 
 # Examples:
 #
@@ -110,7 +113,7 @@ end;
 # gap> GaloisDescentStauduhar(x^5+20*x+16);
 # [ 4, () ]
 GaloisDescentStauduhar := function(P)
-  local Ta, d, T, s, Q, C, l, a, rho, tau, sigma, name, gen, list, b, bloc, K, frob, G, H, blocGP;
+  local Ta, d, T, s, Q, FC, C, l, a, rho, tau, sigma, name, gen, list, b, bloc, K, frob, G, H, blocGP;
   Ta := GaloisDescentTable(Degree(P));
   Q := PARIGetRoots(P);
   frob := PARIGetFrobenius(Q);
@@ -131,18 +134,20 @@ GaloisDescentStauduhar := function(P)
       G := TransitiveGroup(d,b)^(tau^-1*sigma);
       # subgroup to be tested
       H := TransitiveGroup(d,a)^sigma;
-      # short cosets of G/H (wrt the Frobenius permutation)
-      C := List(ShortCosets(H, G, frob), c->PermToGP(c, d));
       K := List(bloc,bl->Orbit(G, OnTuplesSets(bl, sigma), OnTuplesSets));
       K := List(K, y->SortedList(List(y, FlatMonomial)));
+      FC := List( RightTransversal(H,G), c->PermToGP(c, d));
+      if PARICosets_squarefree(FC, K, Q, P) then
+        Print("#I Applying Tschirnhausen transform\n");
+        return GaloisDescentStauduhar(PARITschirnhaus(P));
+      fi;
+      # short cosets of G/H (wrt the Frobenius permutation)
+      C := List(ShortCosets(H, G, frob), c->PermToGP(c, d));
       rho := PARICosets3(C, K, Q, P);
       if IsPerm(rho) then
         sigma := tau^-1*sigma*rho;
         a := b;
         break;
-      elif rho = 1 then
-        Print("#I Applying Tschirnhausen transform\n");
-        return GaloisDescentStauduhar(PARITschirnhaus(P));
       fi;
     od;
   until rho = 0;

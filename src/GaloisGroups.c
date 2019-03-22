@@ -11,41 +11,6 @@ GEN FpXQV_pow(GEN x, GEN T, GEN p)
     pari_APPLY_same(FpXQ_pow(gel(x,i),p,T,p));
 }
 
-static GEN FqV_sum(GEN v, GEN T, GEN p)
-{
-    pari_sp av = avma;
-    long i, l = lg(v);
-    GEN s = gen_0;
-    for(i=1; i<1; i++)
-        s = Fq_mul(s, gel(v,i), T, p);
-    return gerepileupto(av, s);
-}
-
-static GEN FqV_prod(GEN v, GEN T, GEN p)
-{
-  pari_sp av = avma;
-  long i, l = lg(v);
-  GEN s = gen_0;
-  for (i=1; i<l; i++)
-    s = Fq_mul(s, gel(v,i), T, p);
-  return gerepileupto(av, s);
-}
-
-static GEN FlxX_is_Flx(GEN f)
-{
-  pari_sp av = avma;
-  long i, l = lg(f);
-  GEN V = cgetg(l, t_VECSMALL);
-  V[1] = ((ulong)f[1])&VARNBITS;
-  for(i=2; i<l; i++)
-  {
-    GEN fi = gel(f,i);
-    if (degpol(fi) > 0) { avma = av; return NULL; }
-    V[i] = lgpol(fi) ? mael(f,i,2): 0L;
-  }
-  return V;
-}
-
 static GEN ZXX_is_ZX(GEN y)
 {
   pari_sp av = avma;
@@ -119,8 +84,8 @@ long bound(GEN P, long b, long k, ulong p)
   return l1;
 }
 
-GEN
-compute_monomials(GEN R, long k, GEN a, GEN c, GEN T, GEN pe)
+static GEN
+Fq_compute_monomials(GEN R, long k, GEN a, GEN c, GEN T, GEN p)
 {
   long la = lg(a);
   GEN  Vi = cgetg(la, t_VEC);
@@ -131,10 +96,74 @@ compute_monomials(GEN R, long k, GEN a, GEN c, GEN T, GEN pe)
     GEN aj = gel(a, j);
     GEN s = gen_0;
     for (l = 1; l <= k; ++l)
-      s = Fq_add(s, gel(R, c[aj[l]]), T, pe);
+      s = Fq_add(s, gel(R, c[aj[l]]), T, p);
     gel(Vi, j) = gerepileupto(btop, s);
   }
   return Vi;
+}
+
+static GEN
+Flxq_compute_monomials(GEN R, long k, GEN a, GEN c, GEN T, ulong p)
+{
+  long la = lg(a);
+  GEN  g0 = pol0_Flx(get_Flx_var(T));
+  GEN  Vi = cgetg(la, t_VEC);
+  long j, l;
+  for (j = 1; j < la; ++j)
+  {
+    pari_sp btop = avma;
+    GEN aj = gel(a, j);
+    GEN s = g0;
+    for (l = 1; l <= k; ++l)
+      s = Flx_add(s, gel(R, c[aj[l]]), p);
+    gel(Vi, j) = gerepileupto(btop, s);
+  }
+  return Vi;
+}
+
+static GEN
+FlxqV_prod(GEN v, GEN T, ulong p)
+{
+  pari_sp av = avma;
+  long i, l = lg(v);
+  GEN s = pol1_Flx(get_Flx_var(T));
+  for (i = 1; i < l; i++)
+    s = Flxq_mul(s, gel(v,i), T, p);
+  return gerepileupto(av, s);
+}
+
+GEN
+cosets_squarefree(GEN C, GEN K, GEN Q, GEN P)
+{
+  pari_sp ltop = avma, btop;
+  long k = lg(gmael(K, 1, 1))-1;
+  GEN R = gel(Q, 1),  T = gel(Q, 2);
+  GEN pp = gel(Q, 3);
+  ulong p = itou(pp);
+  GEN Tp = ZX_to_Flx(T, p), Rp = ZXV_to_FlxV(R, p);
+  long lK = lg(K)-1, lC = lg(C) -1;
+  long h;
+  btop = avma;
+  for (h = 1; h <= lC; ++h)
+  {
+    GEN c = gel(C, h);
+    GEN Wpr = cgetg(lK+1, t_VEC);
+    GEN Wps;
+    long i;
+    for (i = 1; i <= lK; i++)
+    {
+      GEN V = Flxq_compute_monomials(Rp, k, gel(K, i), c, Tp, p);
+      gel(Wpr, i) = FlxqV_prod(V, Tp, p);
+    }
+    Wps = gtoset(Wpr);
+    if (lg(Wps)!=lg(Wpr))
+    {
+      avma = ltop; return gen_1;
+    }
+    avma = btop;
+  }
+  avma = ltop;
+  return gen_0;
 }
 
 GEN cosets3(GEN C, GEN K, GEN Q, GEN P)
@@ -146,7 +175,6 @@ GEN cosets3(GEN C, GEN K, GEN Q, GEN P)
   GEN R = gel(Q, 1),  T = gel(Q, 2);
   GEN pp = gel(Q, 3);
   ulong p = itou(pp);
-  GEN Tp = ZX_to_Flx(T, p);
   long lK = lg(K)-1, i, sK = 0, lC = lg(C) -1;
   long h;
   for (i = 1; i <= lK; ++i)
@@ -161,29 +189,15 @@ GEN cosets3(GEN C, GEN K, GEN Q, GEN P)
     GEN c = gel(C, h);
     GEN V =   cgetg(lK+1, t_VEC);
     GEN Wr =  cgetg(lK+1, t_VEC);
-    GEN Wpr = cgetg(lK+1, t_VEC);
     long i;
     for (i = lK; i >= 1; i--)
-    {
-      GEN Wp, a = gel(K, i);
-      long j, l, la = lg(a);
-      gel(V, i) = compute_monomials(R, k, a, c, T, pe);
-      Wp =  FlxX_is_Flx(FlxqV_roots_to_pol(FqV_to_FlxV(gel(V, i), T, pp), Tp, p, 0));
-      if (!Wp)
-        goto label1;
-      gel(Wpr, i) = Wp;
-    }
-    if (!Flx_is_squarefree(FlxV_prod(Wpr, p), p))
-    {
-      set_avma(ltop); return gen_1;
-    }
+      gel(V, i) = Fq_compute_monomials(R, k, gel(K, i), c, T, pe);
     for (i = lK; i >= 1; i--)
     {
-      pari_sp btop = avma;
       GEN W = ZXX_is_ZX(FqV_roots_to_pol(gel(V, i), T, pe, 0));
       if (!W)
         goto label1;
-      gel(Wr, i) = gerepilecopy(btop, FpX_center(W, pe, shifti(pe, -1)));
+      gel(Wr, i) = FpX_center(W, pe, shifti(pe, -1));
       if (gcmp(gmulsg(1000, gsupnorm(gel(Wr, i), DEFAULTPREC)), pe) > 0)
         goto label1;
     }
