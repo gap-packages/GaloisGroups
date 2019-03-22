@@ -14,13 +14,6 @@
 #
 # GaloisGroups: Computing Galois Groups using GAP and PARI via
 # Stauduhar method
-#
-# Implementations
-#
-# Right now, the descent is done manually. At each step, the
-# user should choose between a coset or fail. This step should
-# be replaced with PARI/GP function testing integrality of
-# polynomials.
 
 ########################################################
 # Function calls to PARI/GP
@@ -48,7 +41,7 @@ PARIGetRoots := function(P)
   return PARI_CALL2("getroots", PARIPolynomial(P), INT_TO_PARI_GEN(100));
 end;
 
-# Perform a random Tschirnaus transformation on P
+# Perform a random Tschirnausen transformation on P
 #
 # Examples: (though output is random)
 #
@@ -60,23 +53,36 @@ PARITschirnhaus := function(P)
   return UnivariatePolynomial(Rationals, PARI_GEN_GET_DATA(Q));
 end;
 
+# Perform a random Tschirnausen transformation on P where Q are the roots
+# Return [P1,Q1] where P1 is the new polynomial and Q1 is the roots of P1
+# ordered using the same embedding order as for Q.
+PARITschirnhausen := function(P, Q)
+  local U;
+  U := PARI_VEC_TO_LIST(PARI_CALL2("Tschirnhausen", PARIPolynomial(P), Q));
+  return [UnivariatePolynomial(Rationals, PARI_GEN_GET_DATA(U[1])), U[2]];
+end;
+
+
+# Return the action fo the Frobenius on the roots as a permutation
 PARIGetFrobenius := function(Q)
   return GPToPerm(PARI_GEN_GET_DATA(PARI_CALL1("getperm", Q)));
 end;
 
-# evaluation of resolvent... what is this function actually doing?
-PARICosets3 := function(C, K, Q, P)
+# Check whether the resolvant is squarefree
+PARICosets_squarefree := function(C, K, Q, P)
+  return PARI_GEN_GET_DATA(PARI_CALL4("cosets_squarefree", PARI_VECVECSMALL(C), PARI_VECVECSMALL(K), Q, PARIPolynomial(P))) = 1;
+end;
+
+
+# Check whether the resolvant has a rational root
+PARICosets4 := function(C, K, Q, P)
   local r;
-  r := PARI_GEN_GET_DATA(PARI_CALL4("cosets3", PARI_VECVECSMALL(C), PARI_VECVECVECSMALL(K), Q, PARIPolynomial(P)));
+  r:= PARI_GEN_GET_DATA(PARI_CALL4("cosets4", PARI_VECVECSMALL(C), PARI_VECVECSMALL(K), Q, PARIPolynomial(P)));
   if IsList(r) then
     return GPToPerm(r);
   else
     return r;
   fi;
-end;
-
-PARICosets_squarefree := function(C, K, Q, P)
-  return PARI_GEN_GET_DATA(PARI_CALL4("cosets_squarefree", PARI_VECVECSMALL(C), PARI_VECVECVECSMALL(K), Q, PARIPolynomial(P))) <> 0;
 end;
 
 # Examples:
@@ -113,11 +119,14 @@ end;
 # gap> GaloisDescentStauduhar(x^5+20*x+16);
 # [ 4, () ]
 GaloisDescentStauduhar := function(P)
-  local Ta, d, T, s, Q, FC, C, l, a, rho, tau, sigma, name, gen, list, b, bloc, K, frob, G, H, blocGP;
-  Ta := GaloisDescentTable(Degree(P));
-  Q := PARIGetRoots(P);
-  frob := PARIGetFrobenius(Q);
+  local Ta, d, T, s, Q, FC, C, l, a, rho, tau, sigma, name, gen, list, b, bloc, K, frob, G, H, blocGP, av, U, Qo;
   d := Degree(P);
+  if d = 1 then return [ 1, () ]; fi;
+  Ta := GaloisDescentTable(Degree(P));
+  av := PARIGetAvma();
+  Q := PARIGetRoots(P);
+  Qo := PARI_GEN_TO_OBJ(Q);
+  frob := PARIGetFrobenius(Q);
   T := List(Ta, x->x[3]);
   if IsSquareInt(Discriminant(P)) then
     a := Length(T)-1; #A_n
@@ -142,21 +151,18 @@ GaloisDescentStauduhar := function(P)
       # construct the resolvant
       # NOTE: each element of bloc is a valid resolvant (ie a H-invariant but
       #       not G-invariant polynomial). For now, we only consider bloc[1].
-      Print("#I G = ", G, " ~ T(", d, ",", a, ")\n");
-      Print("#I H = ", H, " ~ T(", d, ",", b, ")\n");
+      #Print("#I G = ", G, " ~ T(", d, ",", a, ")\n");
+      #Print("#I H = ", H, " ~ T(", d, ",", b, ")\n");
       K := Orbit(H, OnTuplesSets(bloc[1], sigma), OnTuplesSets);
       K := List(K, FlatMonomial);
       FC := List(RightTransversal(G, H), c->PermToGP(c, d));
-      Print("#I resolvant ", IndicesToPolynomial(K, d), "\n");
-      Print("#I cosets ", FC, "\n");
-      if PARICosets_squarefree(FC, K, Q, P) then
-        Print("#I Applying Tschirnhausen transform\n");
-        return GaloisDescentStauduhar(PARITschirnhaus(P));
-      fi;
-      # short cosets of G/H (wrt the Frobenius permutation)
+      while not PARICosets_squarefree(FC, K, Q, P) do
+      #  Print("#I Applying Tschirnhausen transform\n");
+        U := PARITschirnhausen(P, Q);
+        P := U[1]; Q := U[2];
+      od;
       C := List(ShortCosets(G, H, frob), c->PermToGP(c, d));
-      Print("#I short cosets ", C, "\n");
-      rho := PARICosets3(C, K, Q, P);
+      rho := PARICosets4(C, K, Q, P);
       if IsPerm(rho) then
         sigma := tau^-1*sigma*rho;
         a := b;
@@ -164,10 +170,10 @@ GaloisDescentStauduhar := function(P)
       fi;
     od;
   until rho = 0;
-  return [a,sigma];
+  PARISetAvma(av);
+  return [a,sigma,Qo];
 end;
 
 InstallGlobalFunction(Galois, function(P)
   return GaloisDescentStauduhar(P);
 end);
-
