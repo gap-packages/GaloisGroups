@@ -119,12 +119,30 @@ long bound(GEN P, long b, long k, ulong p)
   return l1;
 }
 
+GEN
+compute_monomials(GEN R, long k, GEN a, GEN c, GEN T, GEN pe)
+{
+  long la = lg(a);
+  GEN  Vi = cgetg(la, t_VEC);
+  long j, l;
+  for (j = 1; j < la; ++j)
+  {
+    pari_sp btop = avma;
+    GEN aj = gel(a, j);
+    GEN s = gen_0;
+    for (l = 1; l <= k; ++l)
+      s = Fq_add(s, gel(R, c[aj[l]]), T, pe);
+    gel(Vi, j) = gerepileupto(btop, s);
+  }
+  return Vi;
+}
+
 GEN cosets3(GEN C, GEN K, GEN Q, GEN P)
 {
   pari_sp ltop = avma, btop;
   long e;
   GEN pe;
-  long k = glength(gel(gel(K, 1), 1));
+  long k = lg(gmael(K, 1, 1))-1;
   GEN R = gel(Q, 1),  T = gel(Q, 2);
   GEN pp = gel(Q, 3);
   ulong p = itou(pp);
@@ -133,7 +151,7 @@ GEN cosets3(GEN C, GEN K, GEN Q, GEN P)
   long h;
   for (i = 1; i <= lK; ++i)
     sK += lg(gel(K, i))-1;
-  e = bound(P, sK, glength(gel(gel(K, 1), 1)), p);
+  e = bound(P, sK, k, p);
   R = ZpXQX_liftroots(P, R, T, pp, e);
   pe = powuu(p, e);
   btop = avma;
@@ -149,18 +167,8 @@ GEN cosets3(GEN C, GEN K, GEN Q, GEN P)
     {
       GEN Wp, a = gel(K, i);
       long j, l, la = lg(a);
-      GEN Vi = cgetg(la, t_VEC);
-      for (j = 1; j < la; ++j)
-      {
-        pari_sp btop = avma;
-        GEN aj = gel(a, j);
-        GEN s = gen_0;
-        for (l = 1; l <= k; ++l)
-          s = Fq_add(s, gel(R, c[aj[l]]), T, pe);
-        gel(Vi, j) = gerepilecopy(btop, s);
-      }
-      gel(V, i) = Vi;
-      Wp =  FlxX_is_Flx(FlxqV_roots_to_pol(FqV_to_FlxV(Vi, T, pp), Tp, p, 0));
+      gel(V, i) = compute_monomials(R, k, a, c, T, pe);
+      Wp =  FlxX_is_Flx(FlxqV_roots_to_pol(FqV_to_FlxV(gel(V, i), T, pp), Tp, p, 0));
       if (!Wp)
         goto label1;
       gel(Wpr, i) = Wp;
