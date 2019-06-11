@@ -59,3 +59,7 @@ DeclareGlobalFunction( "GaloisDescentTable" );
 #! @Arguments G H q
 #! @Returns the list of monomials
 DeclareGlobalFunction( "AllMonomials" );
+
+DeclareGlobalFunction( "IndicesToPolynomial" );
+
+DeclareGlobalFunction( "PrintGaloisDescentTable" );

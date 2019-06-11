@@ -136,6 +136,23 @@ function(G, H, q)
   return L;
 end);
 
+InstallGlobalFunction(IndicesToPolynomial,
+function(I, n)
+  local R,i,j,p,x,m;
+  R := PolynomialRing(Rationals, List([1..n], i->Concatenation("x", String(i))));
+  x := IndeterminatesOfPolynomialRing(R);
+  p := 0;
+  for i in I do
+    m := 1;
+    for j in i do
+      m := m * x[j];
+    od;
+    p := p + m;
+  od;
+  return p;
+end);
+
+
 # Compute data associated to the transitive subgroups in SymmetricGroup(d)
 # the i-th list corresponds to the group TransitiveGroup(d,i) as follows
 #   line[1] : name
@@ -211,6 +228,27 @@ function(d)
   CachedGaloisDescentTable[d] := L;
   return L;
 end);
+
+InstallGlobalFunction(PrintGaloisDescentTable,
+function(d)
+  local T,a,G,b,H,l,K;
+  T := GaloisDescentTable(d);
+  if NrTransitiveGroups(d) <> Size(T) then
+    Error("PROUT");
+  fi;
+  for a in [1..Size(T)] do
+    Print("T(", d, ",", a, " = ", T[a][1], ")\n");
+    G := TransitiveGroup(d, a);
+    for l in T[a][3] do
+      b := l[1];
+      H := TransitiveGroup(d,b)^(l[2]^-1);
+      K := Orbit(H, l[3][1][2], OnTuplesSets);
+      K := List(K, FlatMonomial);
+      Print("  T(", d, ",", b, "): ", IndicesToPolynomial(K,d), "\n");
+    od;
+  od;
+end);
+
 
 #######################################################################
 # Old code that might be recycled later on

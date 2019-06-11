@@ -137,9 +137,10 @@ GaloisDescentStauduhar := function(P)
 
       # construct the resolvant
       # NOTE: each element of bloc is a valid resolvant (ie a H-invariant but
-      # not G-invariant polynomial)
+      #       not G-invariant polynomial). For now, we only consider bloc[1].
       K := Orbit(H, OnTuplesSets(bloc[1], sigma), OnTuplesSets);
       K := List(K, FlatMonomial);
+      Print("#I resolvant ", IndicesToPolynomial(K, d), "\n");
       FC := List(RightTransversal(H,G), c->PermToGP(c, d));
       if PARICosets_squarefree(FC, K, Q, P) then
         Print("#I Applying Tschirnhausen transform\n");
