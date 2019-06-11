@@ -134,9 +134,13 @@ GaloisDescentStauduhar := function(P)
       G := TransitiveGroup(d,b)^(tau^-1*sigma);
       # subgroup to be tested
       H := TransitiveGroup(d,a)^sigma;
-      K := List(bloc,bl->Orbit(G, OnTuplesSets(bl, sigma), OnTuplesSets));
-      K := List(K, y->SortedList(List(y, FlatMonomial)));
-      FC := List( RightTransversal(H,G), c->PermToGP(c, d));
+
+      # construct the resolvant
+      # NOTE: each element of bloc is a valid resolvant (ie a H-invariant but
+      # not G-invariant polynomial)
+      K := Orbit(H, OnTuplesSets(bloc[1], sigma), OnTuplesSets);
+      K := List(K, FlatMonomial);
+      FC := List(RightTransversal(H,G), c->PermToGP(c, d));
       if PARICosets_squarefree(FC, K, Q, P) then
         Print("#I Applying Tschirnhausen transform\n");
         return GaloisDescentStauduhar(PARITschirnhaus(P));
