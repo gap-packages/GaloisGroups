@@ -174,7 +174,10 @@ function(d)
   if not IsInt(d) or d <= 1 then
     Error("invalid d parameter");
   fi;
-  if IsBound(CachedGaloisDescentTable[d]) then
+  if IsBound(GaloisDescentTables[d]) then
+    return GaloisDescentTables[d];
+  fi;
+ if IsBound(CachedGaloisDescentTable[d]) then
     return CachedGaloisDescentTable[d];
   fi;
 
