@@ -102,7 +102,7 @@ PackageDoc := rec(
 ),
 
 Dependencies := rec(
-  GAP := ">= 4.8",
+  GAP := ">= 4.11",
   NeededOtherPackages := [ [ "GAPDoc", ">= 1.6" ]
                          , [ "Digraphs", ">= 0.11" ]
                          , [ "ferret", ">= 0.8.0" ]

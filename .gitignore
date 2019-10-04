@@ -1,26 +1,10 @@
 *.swp
 
 /doc/
-/cnf/
-/gen/
 
-.deps/
-.dirstamp
-.libs/
-
-/aclocal.m4
-/autom4te.cache/
 /bin/
-/config.log
-/config.status
-/lib/
-/libtool
+/gen/
 /Makefile
-/src/pkgconfig.h
-/src/stamp-h1
-
-*.la
-src/*.lo
 
 /tmp/
 /gh-pages/
