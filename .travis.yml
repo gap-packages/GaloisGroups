@@ -2,8 +2,6 @@ dist: xenial
 language: c
 env:
   global:
-    - GAPROOT=gaproot
-    - COVDIR=coverage
     - GAP_PKGS_TO_CLONE="ferret PARIInterface"
     - GAP_PKGS_TO_BUILD="io profiling ferret digraphs PARIInterface"
 
@@ -11,26 +9,23 @@ addons:
   apt_packages:
     - libgmp-dev
     - libreadline-dev
+    - zlib1g-dev
     - libpari-dev # for PARIInterface
 
 matrix:
   include:
-    - env: CFLAGS="-O2" CC=clang CXX=clang++
-      compiler: clang
-    - env: CFLAGS="-O2"
-      compiler: gcc
-    - env: CFLAGS=""  # test build w/o optimization
+    - env: GAPBRANCH=master
+    - env: GAPBRANCH=stable-4.11
 
 branches:
   only:
     - master
 
 before_script:
-  - export GAPROOT="$HOME/gap"
   - git clone https://github.com/gap-system/pkg-ci-scripts.git scripts
   - scripts/build_gap.sh
 script:
   - scripts/build_pkg.sh && scripts/run_tests.sh
 after_script:
-  - bash scripts/gather-coverage.sh
+  - scripts/gather-coverage.sh
   - bash <(curl -s https://codecov.io/bash)

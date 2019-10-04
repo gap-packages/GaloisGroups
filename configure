@@ -22,17 +22,19 @@ function error_msg_and_quit {
     exit 1
 }
 
-GAPPATH=../..;
+GAPPATH=../..
+PARIPATH=
 
 while [[ $# -gt 0 ]]; do
     key="$1"
 
     case $key in
         --with-pari)
+        PARIPATH="$2"
         EXTRA_CPPFLAGS="-I$2/include"
         EXTRA_LDFLAGS="-L$2/lib"
         if test ! -r $2/include/pari/pari.h; then
-            error_msg_and_quit "$2 does not look like a proper pari installtion tree"
+            error_msg_and_quit "$2 does not look like a proper pari installation tree"
         fi
         shift
         shift
@@ -53,12 +55,14 @@ fi
 # "-L/opt/pari/gp-galois/lib"
 #
 
-echo "Using config in $GAPPATH/sysinfo.gap"
+echo "Using settings from $GAPPATH/sysinfo.gap"
 
-. "$GAPPATH/sysinfo.gap"
+# update Makefile.gappkg from GAP installation, if possible
+test -r "$GAPPATH/etc/Makefile.gappkg" && cp "$GAPPATH/etc/Makefile.gappkg" .
+
 sed \
-    -e "s;@GAPARCH@;$GAParch;g" \
     -e "s;@GAPPATH@;$GAPPATH;g" \
+    -e "s;@PARIPATH@;$PARIPATH;g" \
     -e "s;@EXTRA_CPPFLAGS@;$EXTRA_CPPFLAGS;g" \
     -e "s;@EXTRA_LDFLAGS@;$EXTRA_LDFLAGS;g" \
     Makefile.in > Makefile
