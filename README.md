@@ -7,7 +7,7 @@
 This package implements the computation of Galois group.
 
 For arithmetic computations, the package relies on
-[PARI/GP](http://pari.math.u-bordeaux.fr/)  called via the PARIInterface
+[PARI/GP](https://pari.math.u-bordeaux.fr/)  called via the PARIInterface
 package.
 
 ## Requirements
@@ -39,7 +39,7 @@ Full information and documentation can be found in the manual, available
 as PDF `doc/manual.pdf` or as HTML `doc/chap0_mj.html`, or on the package
 homepage at
 
-  <http://gap-packages.github.io/GaloisGroups/>
+  <https://gap-packages.github.io/GaloisGroups/>
 
 
 ## Bug reports and feature requests
