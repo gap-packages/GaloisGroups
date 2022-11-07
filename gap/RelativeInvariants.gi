@@ -124,14 +124,28 @@ end;
 
 InstallGlobalFunction(AllMonomials,
 function(G, H, q)
-  local o,k,L;
-  # o := Orb(G, q, OnTuplesSets);
-  # Enumerate(o);
-  # return FindSuborbits(o, H);
-  o := Orbit(G, q, OnTuplesSets);
+  local o,k,L,
+    stb,dc,rep,elm,i,m,conj;
+
+  # split the G-orbit up into H-orbits
+
+  stb:=Stabilizer(G,q,OnTuplesSets);
+  dc:=DoubleCosetRepsAndSizes(G,stb,H);
   L := [];
-  for k in Orbits(H, o, OnTuplesSets) do
-    Add(L, [Size(k), Minimum(k)]);
+  for k in dc do
+    rep:=OnTuplesSets(q,k[1]);
+    # now minimize rep one-by-one
+    stb:=H;
+    elm:=One(H);
+    for i in [1..Length(rep)] do
+      o:=Orbit(stb,rep[i],OnSets);
+      m:=Minimum(o);
+      conj:=RepresentativeAction(stb,rep[i],m,OnSets);
+      elm:=elm*conj;
+      rep:=OnTuplesSets(rep,conj);
+      stb:=Stabilizer(stb,m,OnSets);
+    od;
+    Add(L,[IndexNC(H,stb),rep]);
   od;
   return L;
 end);
@@ -190,23 +204,27 @@ function(d)
   for i in [1..NrTransitiveGroups(d)] do
     G := TransitiveGroup(d,i);
     gr := [];
-
+    Print("Processing " , i,":\c");
     # 1 group string
     Add(gr, ViewString(G));
+    Print(" str\c");
 
     # 2. generators
     Add(gr, GeneratorsOfGroup(G));
+    Print(" gen\c");
 
     # 3. list of subgroups
     subgs := [];
+    Print(" subg ", Size(t[2][i]),":\c");
     for j in [1..Size(t[2][i])] do
+      Print(" ", j, "\c");
       subg := [];
       k := t[2][i][j];
       H := t[3][i][j][1];
       cH := t[3][i][j][2];
-      if H^cH <> TransitiveGroup(d,k) then
-        Error("pb");
-      fi;
+#      if H^cH <> TransitiveGroup(d,k) then
+#        Error("pb");
+#      fi;
 
       # Ignore the case Sign(G) <> Sign(H)
       if SignPermGroup(G) <> SignPermGroup(H) then
@@ -219,13 +237,16 @@ function(d)
 
       # 3.b monomials
       q := MonomialMinimalDegree(G, H, P);
+      Print("m\c");
       Add(subg, AllMonomials(G, H, q));
+      Print("o\c");
 
       Add(subgs, subg);
     od;
 
     Add(gr, subgs);
     Add(L, gr);
+    Print("\n");
   od;
 
   CachedGaloisDescentTable[d] := L;
