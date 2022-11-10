@@ -119,7 +119,7 @@ end;
 # gap> GaloisDescentStauduhar(x^5+20*x+16);
 # [ 4, () ]
 GaloisDescentStauduhar := function(P)
-  local Ta, d, T, s, Q, FC, C, l, a, rho, tau, sigma, name, gen, list, b, bloc, K, frob, G, H, blocGP, av, U, Qo;
+  local Ta, d, S, T, s, Q, FC, C, l, a, rho, tau, sigma, name, gen, list, b, bloc, K, frob, G, H, blocGP, av, U, Qo;
   d := Degree(P);
   if d = 1 then return [ 1, () ]; fi;
   Ta := GaloisDescentTable(Degree(P));
@@ -153,8 +153,8 @@ GaloisDescentStauduhar := function(P)
       #       not G-invariant polynomial). For now, we only consider bloc[1].
       #Print("#I G = ", G, " ~ T(", d, ",", a, ")\n");
       #Print("#I H = ", H, " ~ T(", d, ",", b, ")\n");
-      K := Orbit(H, OnTuplesSets(bloc[1], sigma), OnTuplesSets);
-      K := List(K, FlatMonomial);
+      S := OnTuplesSets(bloc[1], sigma);
+      K := List(RightTransversal(H,Stabilizer(H,S,OnTuplesSets)),x->FlatMonomial(OnTuplesSets(S,x)));;
       FC := List(RightTransversal(G, H), c->PermToGP(c, d));
       while not PARICosets_squarefree(FC, K, Q, P) do
       #  Print("#I Applying Tschirnhausen transform\n");
