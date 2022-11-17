@@ -12,7 +12,7 @@ SOURCES = src/GaloisGroups.c
 
 TOP = $(shell pwd)
 EXTRA_CPPFLAGS = @EXTRA_CPPFLAGS@
-EXTRA_LDFLAGS = @EXTRA_LDFLAGS@
+EXTRA_LDFLAGS = @EXTRA_LDFLAGS@ -lpari
 EXTERN_FILES =
 
 ########################################################################
