@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/gap-packages/GaloisGroups.svg?branch=master)](https://travis-ci.org/gap-packages/GaloisGroups)
+[![Build Status](https://github.com/gap-packages/GaloisGroups/workflows/CI/badge.svg?branch=master)](https://github.com/gap-packages/GaloisGroups/actions?query=workflow%3ACI+branch%3Amaster)
 [![Code Coverage](https://codecov.io/github/gap-packages/GaloisGroups/coverage.svg?branch=master&token=)](https://codecov.io/gh/gap-packages/GaloisGroups)
 
 
