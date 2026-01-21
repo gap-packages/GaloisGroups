@@ -30,7 +30,7 @@ that implement function unavailable in PARI/GP 2.11 (e.g. `ZpXQX_liftroots`).
 If you need the compiler to know about a special location of PARI/GP runs
 configure with appropriate options
 
-    $ ./configure [GAPPATH] --with-pari [PARIPATH]
+    $ ./configure [GAPPATH] [--with-pari=PARIPATH]
 
 
 ## Documentation
