@@ -1,13 +1,13 @@
-#!/usr/bin/env bash
+#!/bin/sh
 # usage: configure gappath
 # this script creates a `Makefile' from `Makefile.in'
 
 set -e
 
-function error_msg_and_quit {
-    echo $1
+error_msg_and_quit() {
+    echo "$1"
     echo
-    echo "Usage: ./configure [GAPPATH] [--with-pari PARIPATH]"
+    echo "Usage: ./configure [GAPPATH] [--with-pari=PARIPATH]"
     echo
     echo " where"
     echo "  - GAPPATH is a path to your GAP installation"
@@ -22,43 +22,30 @@ function error_msg_and_quit {
     exit 1
 }
 
-GAPPATH=../..;
-
-while [[ $# -gt 0 ]]; do
-    key="$1"
-
-    case $key in
-        --with-pari)
-        EXTRA_CPPFLAGS="-I$2/include"
-        EXTRA_LDFLAGS="-L$2/lib"
-        if test ! -r $2/include/pari/pari.h; then
-            error_msg_and_quit "$2 does not look like a proper pari installtion tree"
-        fi
-        shift
-        shift
-        ;;
-        *)
-        GAPPATH=$1
-        shift
-        ;;
-    esac
+GAPPATH=../..
+PARIPATH=
+while test "$#" -ge 1 ; do
+  option="$1" ; shift
+  case "$option" in
+    --with-gaproot=*) GAPPATH=${option#--with-gaproot=}; ;;
+    --with-pari=*)    PARIPATH=${option#--with-pari=}; ;;
+    -*)               echo "ERROR: unsupported argument $option" ; exit 1;;
+    *)                GAPPATH="$option" ;;
+  esac
 done
 
-if test ! -r $GAPPATH/sysinfo.gap ; then
+if test ! -r "$GAPPATH/sysinfo.gap" ; then
     error_msg_and_quit "No file $GAPPATH/sysinfo.gap found."
 fi
 
-# handle --with-pari option for custom PARI/GP installation
-# "-I/opt/pari/gp-galois/include"
-# "-L/opt/pari/gp-galois/lib"
-#
+if test -n "$PARIPATH" && test "$PARIPATH" != "builtin"; then
+    if test ! -r "$PARIPATH/include/pari/pari.h"; then
+        error_msg_and_quit "$2 does not look like a proper pari installtion tree"
+    fi
+fi
 
-echo "Using config in $GAPPATH/sysinfo.gap"
-
-. "$GAPPATH/sysinfo.gap"
+echo "Using settings from $GAPPATH/sysinfo.gap"
 sed \
-    -e "s;@GAPARCH@;$GAParch;g" \
-    -e "s;@GAPPATH@;$GAPPATH;g" \
-    -e "s;@EXTRA_CPPFLAGS@;$EXTRA_CPPFLAGS;g" \
-    -e "s;@EXTRA_LDFLAGS@;$EXTRA_LDFLAGS;g" \
+    -e "s;@GAPPATH@;$GAPPATH;" \
+    -e "s;@PARIPATH@;$PARIPATH;" \
     Makefile.in > Makefile
